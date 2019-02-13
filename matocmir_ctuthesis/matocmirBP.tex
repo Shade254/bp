@@ -5,8 +5,8 @@ xdoctype = B,
 xfaculty = F3,
 mainlanguage = english,
 secondlanguage = czech,
-title-english = {Planning of enclosed walks optimizing pleasantness criterion},
-title-czech = {Plánování okružních tras při optimalizaci kritéria přívětivosti},
+title-english = {Planning routes for recreational cycling},
+title-czech = {Plánování tras pro rekreační cyklistiku},
 department-english = {Department of Computer Science},
 author = {Miroslav Matocha},
 supervisor = {doc. Ing. Michal Jakob, Ph.D.},
@@ -63,7 +63,13 @@ Input to our problem is a mentioned graph \(G=(V, E)\). One starting node \(s \i
 \section{Tour pleasantness}
 
 \section{Tour roundness}
-Another property which we are interested in is the tour roundness. We could just ban revisitng the edges, but this hard constraint could disqualify a whole range of problem instances. For example every instance where starting point is located in dead-end street has to be treated specially. As well as instances with large neigbourhoods accessible by one edge only. These would be completely invisible to algorithm with implemented hard constraint.
+Another property which we are interested in is the tour roundness. We could just ban revisitng the edges, but this hard constraint could disqualify a whole range of problem solutions. For example every instance where starting point is located in dead-end street has to be treated specially. As well as instances with large neigbourhoods accessible by one edge only. These would be completely invisible to algorithm with implemented hard constraint. Instead we will describe a functional roundness metric which assigns values between 0 and 1 to every edge of the walk, this value can be later added to the minimalizing term of the algorithm.\par
+This metric is based on sinusoidal relation between displacement and distance of two point on the circle (as shown in Fig. 3.1). We obtain displacement between edges by computing distance as crown flies between two GPS locations representing their centers. We will mark this distance as \(d_{real}\). Then we will define \(d_{exp}: E^2 \rightarrow \mathbb{R_+}\) which represents the expected displacement of these centers based on distance of shortest path between these two edges. To use the sinusoidal relation to compute the \(d_{exp}\) we would need to know the final length of the tour, which is not known yet and lies somwhere in \(L\). Instead of using one of interval bounds we will approximate 
+
+\begin{figure}
+\includegraphics[width=0.4\textwidth]{displacement}
+\caption{Ilustration of distance and displacement.}
+\end{figure}
 
 \section{Geospatial diversity}
 
