@@ -2,6 +2,7 @@ package cz.matocmir.tours;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -22,8 +23,15 @@ public class Main {
 		System.out.println("Found: " + cands.size());
 		visualizeNodes(cands.stream().map(c -> c.correspNode.getNode()).collect(Collectors.toList()), "found.geojson");
 
-		//TODO - random candidate, extract path, visualize it
+		int numOfTries = 4;
+		for(int i = 0;i<numOfTries;i++){
+			int randomNum = ThreadLocalRandom.current().nextInt(0, cands.size());
+			TreeNode randomCand = cands.get(randomNum).correspNode;
+			visualizePath(randomCand.pathFromRoot(), "cand_path_" + i + ".geojson");
+		}
+
 		//TODO - add roundness criterium
+		//TODO - candidates probabilites edited to reflect geospatial diversity
 	}
 
 	private static void visualizeNodes(List<TourNode> nodes, String jsonFile){
@@ -45,8 +53,35 @@ public class Main {
 		}
 	}
 
-	private static void visualizePath(List<TreeNode> nodes){
+	private static void visualizePath(List<TreeNode> treeNodes, String jsonFile){
+		List<TourEdge> edges = treeNodes.stream().map(TreeNode::getEdgeFromParent).filter(Objects::nonNull).collect(Collectors.toList());
+		List<TourNode> nodes = treeNodes.stream().map(TreeNode::getNode).filter(Objects::nonNull).collect(Collectors.toList());
 
+		try(PrintStream c = new PrintStream(jsonFile)) {
+
+			c.print("{\n" + "  \"type\": \"FeatureCollection\",\n" + "  \"features\": [");
+			StringBuilder sb = new StringBuilder();
+
+			for (TourNode node : nodes) {
+				sb.append(String.format("{\n" + "      \"type\": \"Feature\",\n" + "      \"geometry\": {\n" + "        \"type\": \"Point\",\n" + "        \"coordinates\": [%.5f, %.5f]\n" + "      },\n"
+								+ "      \"properties\": {\n" + "        \"name\": \"%s\"\n" + "      }\n" + "    },",
+						node.getLongitude(), node.getLatitude(), node.getId() + ""));
+			}
+
+			for(TourEdge edge : edges){
+				sb.append("{\n" + "      \"type\": \"Feature\",\n" + "      \"geometry\": {\n"
+						+ "        \"type\": \"LineString\",\n" + "        \"coordinates\": [");
+				sb.append(String.format("[%.5f, %.5f],", edge.getFrom().getLongitude(), edge.getFrom().getLatitude()));
+				sb.append(String.format("[%.5f, %.5f]]", edge.getTo().getLongitude(), edge.getTo().getLatitude()));
+				sb.append("},\n");
+				sb.append(String.format("\"properties\": {\n" + "        \"name\": \"%s\"\n" + "      }\n" + "    },", edge.getCost()));
+			}
+
+			c.print(sb.substring(0, sb.length() - 1));
+			c.print("]\n" + "}");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static TourGraph loadGraph(String graphPath) {
