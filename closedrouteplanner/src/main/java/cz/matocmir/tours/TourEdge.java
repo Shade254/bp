@@ -13,11 +13,20 @@ public class TourEdge implements IEdge {
 	private int length;
 	private GPSLocation middle;
 
+	public TourEdge(TourNode from, TourNode to, int cost, int length) {
+		this.from = from;
+		this.to = to;
+		this.cost = cost;
+		this.length = length;
+		//TODO - fix, edges in osm graph are not straight only
+		middle = new GPSLocation((from.getLatitude()+to.getLatitude()/2), (from.getLongitude()+to.getLongitude())/2, 0, 0);
+	}
+
 	public TourEdge(TourNode from, TourNode to, int cost) {
 		this.from = from;
 		this.to = to;
 		this.cost = cost;
-		length = (int)(TourUtils.computeEuclideanDistance(from.getLatitude(), from.getLongitude(), to.getLatitude(), to.getLongitude())/10);
+		length = (int)(TourUtils.computeEuclideanDistance(from.getLatitude(), from.getLongitude(), to.getLatitude(), to.getLongitude()));
 		//TODO - fix, edges in osm graph are not straight only
 		middle = new GPSLocation((from.getLatitude()+to.getLatitude()/2), (from.getLongitude()+to.getLongitude())/2, 0, 0);
 	}
@@ -56,5 +65,11 @@ public class TourEdge implements IEdge {
 	@Override
 	public List<? extends INode> getViaNodes() {
 		return null;
+	}
+
+	@Override
+	public String toString() {
+		return "TourEdge{" + "from=" + from + ", to=" + to + ", cost=" + cost + ", length=" + length + ", middle="
+				+ middle + '}';
 	}
 }

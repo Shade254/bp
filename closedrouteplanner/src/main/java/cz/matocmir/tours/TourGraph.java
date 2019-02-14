@@ -2,17 +2,19 @@ package cz.matocmir.tours;
 
 import com.umotional.basestructures.GraphStructure;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TourGraph implements GraphStructure<TourNode, TourEdge> {
 	private HashMap<Integer, TourNode> nodes = new HashMap<>();
 	private HashMap<EdgeId, TourEdge> edges = new HashMap<>();
+	private HashMap<Integer, List<TourEdge>> outgoingEdges = new HashMap<>();
+	private HashMap<Integer, List<TourEdge>> incomingEdges = new HashMap<>();
+
 
 
 	public void addEdge(TourEdge edge){
@@ -31,6 +33,11 @@ public class TourGraph implements GraphStructure<TourNode, TourEdge> {
 		EdgeId eId = new EdgeId(edge.getFromId(), edge.getToId());
 		edges.put(eId, edge);
 
+		outgoingEdges.putIfAbsent(edge.getFromId(), new ArrayList<>());
+		incomingEdges.putIfAbsent(edge.getToId(), new ArrayList<>());
+
+		outgoingEdges.get(edge.getFromId()).add(edge);
+		incomingEdges.get(edge.getToId()).add(edge);
 	}
 
 	public void addNode(TourNode node){
@@ -77,22 +84,22 @@ public class TourGraph implements GraphStructure<TourNode, TourEdge> {
 
 	@Override
 	public List<TourEdge> getInEdges(TourNode tourNode) {
-		return null;
+		return getInEdges(tourNode.getId());
 	}
 
 	@Override
 	public List<TourEdge> getInEdges(int i) {
-		return null;
+		return incomingEdges.get(i);
 	}
 
 	@Override
 	public List<TourEdge> getOutEdges(TourNode tourNode) {
-		return null;
+		return getOutEdges(tourNode.getId());
 	}
 
 	@Override
 	public List<TourEdge> getOutEdges(int i) {
-		return null;
+		return outgoingEdges.get(i) == null ? new ArrayList<>() : outgoingEdges.get(i);
 	}
 
 	@Override

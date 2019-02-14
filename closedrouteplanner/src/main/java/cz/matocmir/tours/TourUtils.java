@@ -15,4 +15,8 @@ public class TourUtils {
 		float dist = (float)(earthRadius * c);
 		return (double)dist;
 	}
+
+	public static double computeEuclideanDistance(TourNode node, TourNode node1) {
+		return computeEuclideanDistance(node.getLatitude(), node.getLongitude(), node.getLatitude(), node.getLongitude());
+	}
 }
