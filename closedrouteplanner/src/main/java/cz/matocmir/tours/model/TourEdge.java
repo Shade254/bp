@@ -1,19 +1,20 @@
-package cz.matocmir.tours;
+package cz.matocmir.tours.model;
 
 import com.umotional.basestructures.GPSLocation;
 import com.umotional.basestructures.IEdge;
 import com.umotional.basestructures.INode;
+import cz.matocmir.tours.utils.TourUtils;
 
 import java.util.List;
 
 public class TourEdge implements IEdge {
 	private TourNode from;
 	private TourNode to;
-	private int cost;
-	private int length;
+	private double cost;
+	private double length;
 	private GPSLocation middle;
 
-	public TourEdge(TourNode from, TourNode to, int cost, int length) {
+	public TourEdge(TourNode from, TourNode to, double cost, double length) {
 		this.from = from;
 		this.to = to;
 		this.cost = cost;
@@ -22,13 +23,24 @@ public class TourEdge implements IEdge {
 		middle = new GPSLocation((from.getLatitude()+to.getLatitude()/2), (from.getLongitude()+to.getLongitude())/2, 0, 0);
 	}
 
-	public TourEdge(TourNode from, TourNode to, int cost) {
+	public TourEdge(TourNode from, TourNode to, double cost) {
 		this.from = from;
 		this.to = to;
 		this.cost = cost;
 		length = (int)(TourUtils.computeEuclideanDistance(from.getLatitude(), from.getLongitude(), to.getLatitude(), to.getLongitude()));
 		//TODO - fix, edges in osm graph are not straight only
 		middle = new GPSLocation((from.getLatitude()+to.getLatitude()/2), (from.getLongitude()+to.getLongitude())/2, 0, 0);
+	}
+
+	public double roundnessPenalty(TourEdge e2, double distance, double strictness){
+		double dExp = TourUtils.getExpectedDisplacement(distance);
+		double displacement = TourUtils.computeGreatCircleDistance(middle.getLatitude(), middle.getLongitude(), e2.middle.getLatitude(), e2.middle.getLongitude());
+
+		if(displacement > dExp*strictness){
+			return 0;
+		}
+
+		return ((strictness*dExp)-displacement)/(strictness*dExp);
 	}
 
 	public TourNode getFrom() {
@@ -39,7 +51,7 @@ public class TourEdge implements IEdge {
 		return to;
 	}
 
-	public int getCost() {
+	public double getCost() {
 		return cost;
 	}
 

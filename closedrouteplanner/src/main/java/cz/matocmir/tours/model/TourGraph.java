@@ -1,4 +1,4 @@
-package cz.matocmir.tours;
+package cz.matocmir.tours.model;
 
 import com.umotional.basestructures.GraphStructure;
 

@@ -1,8 +1,10 @@
 package cz.matocmir.tours;
 
-import java.io.*;
+import cz.matocmir.tours.model.*;
+import cz.matocmir.tours.utils.IOUtils;
+import cz.matocmir.tours.utils.TourUtils;
+
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -10,100 +12,31 @@ public class Main {
 	public static void main(String[] args) {
 		final String graphPath = "./src/main/resources/prague.csv";
 		System.out.println("Loading graph from file: " + graphPath);
-		TourGraph loadedGraph = loadGraph(graphPath);
+		TourGraph loadedGraph = IOUtils.loadGraph(graphPath);
 
 		//System.out.println("Graph loaded ... dumping");
 		//loadedGraph.dumpToGeoJson("test.geojson");
 
 		TourNode startingNode = loadedGraph.getNode(17500);
-		final int minLength = 1500;
-		final int maxLength = 5000;
+		final int minLength = 4500;
+		final int maxLength = 7000;
 
 		List<Candidate> cands = forwardSearch(loadedGraph, startingNode, minLength, maxLength);
 		System.out.println("Found: " + cands.size());
-		visualizeNodes(cands.stream().map(c -> c.correspNode.getNode()).collect(Collectors.toList()), "found.geojson");
+		IOUtils.visualizeNodes(cands.stream().map(c -> c.correspNode.getNode()).collect(Collectors.toList()), "found.geojson");
 
-		int numOfTries = 4;
+		int numOfTries = 11;
+		CandidatesPicker candidatesPicker = new CandidatesPicker(cands, startingNode, minLength);
+		List<Candidate> picked = candidatesPicker.selectCandidates(numOfTries);
+
+
 		for(int i = 0;i<numOfTries;i++){
-			int randomNum = ThreadLocalRandom.current().nextInt(0, cands.size());
-			TreeNode randomCand = cands.get(randomNum).correspNode;
-			visualizePath(randomCand.pathFromRoot(), "cand_path_" + i + ".geojson");
+			TreeNode randomCand = picked.get(i).correspNode;
+			IOUtils.visualizePath(randomCand.pathFromRoot(), "cand_path_" + i + ".geojson");
 		}
 
 		//TODO - add roundness criterium
 		//TODO - candidates probabilites edited to reflect geospatial diversity
-	}
-
-	private static void visualizeNodes(List<TourNode> nodes, String jsonFile){
-		try(PrintStream c = new PrintStream(jsonFile)) {
-
-			c.print("{\n" + "  \"type\": \"FeatureCollection\",\n" + "  \"features\": [");
-			StringBuilder sb = new StringBuilder();
-
-			for (TourNode node : nodes) {
-				sb.append(String.format("{\n" + "      \"type\": \"Feature\",\n" + "      \"geometry\": {\n" + "        \"type\": \"Point\",\n" + "        \"coordinates\": [%.5f, %.5f]\n" + "      },\n"
-								+ "      \"properties\": {\n" + "        \"name\": \"%s\"\n" + "      }\n" + "    },",
-						node.getLongitude(), node.getLatitude(), node.getId() + ""));
-			}
-
-			c.print(sb.substring(0, sb.length() - 1));
-			c.print("]\n" + "}");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static void visualizePath(List<TreeNode> treeNodes, String jsonFile){
-		List<TourEdge> edges = treeNodes.stream().map(TreeNode::getEdgeFromParent).filter(Objects::nonNull).collect(Collectors.toList());
-		List<TourNode> nodes = treeNodes.stream().map(TreeNode::getNode).filter(Objects::nonNull).collect(Collectors.toList());
-
-		try(PrintStream c = new PrintStream(jsonFile)) {
-
-			c.print("{\n" + "  \"type\": \"FeatureCollection\",\n" + "  \"features\": [");
-			StringBuilder sb = new StringBuilder();
-
-			for (TourNode node : nodes) {
-				sb.append(String.format("{\n" + "      \"type\": \"Feature\",\n" + "      \"geometry\": {\n" + "        \"type\": \"Point\",\n" + "        \"coordinates\": [%.5f, %.5f]\n" + "      },\n"
-								+ "      \"properties\": {\n" + "        \"name\": \"%s\"\n" + "      }\n" + "    },",
-						node.getLongitude(), node.getLatitude(), node.getId() + ""));
-			}
-
-			for(TourEdge edge : edges){
-				sb.append("{\n" + "      \"type\": \"Feature\",\n" + "      \"geometry\": {\n"
-						+ "        \"type\": \"LineString\",\n" + "        \"coordinates\": [");
-				sb.append(String.format("[%.5f, %.5f],", edge.getFrom().getLongitude(), edge.getFrom().getLatitude()));
-				sb.append(String.format("[%.5f, %.5f]]", edge.getTo().getLongitude(), edge.getTo().getLatitude()));
-				sb.append("},\n");
-				sb.append(String.format("\"properties\": {\n" + "        \"name\": \"%s\"\n" + "      }\n" + "    },", edge.getCost()));
-			}
-
-			c.print(sb.substring(0, sb.length() - 1));
-			c.print("]\n" + "}");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static TourGraph loadGraph(String graphPath) {
-		TourGraph g = new TourGraph();
-
-		try (BufferedReader reader = new BufferedReader(new FileReader(graphPath))) {
-			//column titles
-			reader.readLine();
-
-			reader.lines()/*.limit(20000)*/.map(line -> {
-				String[] pom = line.split(";");
-				TourNode from = new TourNode(Double.parseDouble(pom[3]), Double.parseDouble(pom[4]),
-						Integer.parseInt(pom[0]));
-				TourNode to = new TourNode(Double.parseDouble(pom[5]), Double.parseDouble(pom[6]),
-						Integer.parseInt(pom[1]));
-				return new TourEdge(from, to, Integer.parseInt(pom[7]), (int)Double.parseDouble(pom[2]));
-			}).forEach(g::addEdge);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return g;
 	}
 
 	private static ArrayList<Candidate> forwardSearch(TourGraph graph, TourNode startNode, int minLength,
@@ -111,7 +44,7 @@ public class Main {
 		final double epsilon = 0.001;
 		ArrayList<Candidate> candidates = new ArrayList<>();
 
-		Queue<Candidate> q = new PriorityQueue<>(Comparator.comparingInt(o -> o.weight));
+		Queue<Candidate> q = new PriorityQueue<>(Comparator.comparingDouble(o -> o.weight));
 		q.add(new Candidate(new TreeNode(null, null, startNode), 0, 0));
 		HashSet<Integer> addedIds = new HashSet<>();
 
@@ -126,7 +59,7 @@ public class Main {
 				for (TourEdge e : outEdges) {
 					System.out.println("Edge " + e.toString());
 					Candidate cn = new Candidate(new TreeNode(e, curN, e.getTo()), cur.weight + e.getCost(),
-							cur.length + (int) e.getLengthInMeters());
+							cur.length + e.getLengthInMeters());
 					List<TourEdge> cnOutEdges = graph.getOutEdges(cn.correspNode.getNode().getId());
 					HashSet<Integer> encounteredIds = new HashSet<>(); // Cycle detection
 
@@ -134,7 +67,7 @@ public class Main {
 					while (cnOutEdges.size() == 1 && cn.length <= maxLength + epsilon) {
 						e = cnOutEdges.get(0);
 						cn = new Candidate(new TreeNode(e, cn.correspNode, e.getTo()), cn.weight + e.getCost(),
-								cn.length + (int) e.getLengthInMeters());
+								cn.length + e.getLengthInMeters());
 						cnOutEdges = graph.getOutEdges(cn.correspNode.getNode().getId());
 
 						if (!encounteredIds.add(cn.correspNode.getNode().getId())) {

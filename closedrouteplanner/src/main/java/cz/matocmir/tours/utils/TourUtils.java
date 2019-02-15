@@ -1,4 +1,6 @@
-package cz.matocmir.tours;
+package cz.matocmir.tours.utils;
+
+import cz.matocmir.tours.model.TourNode;
 
 public class TourUtils {
 
@@ -18,5 +20,21 @@ public class TourUtils {
 
 	public static double computeEuclideanDistance(TourNode node, TourNode node1) {
 		return computeEuclideanDistance(node.getLatitude(), node.getLongitude(), node.getLatitude(), node.getLongitude());
+	}
+
+	//angle = 360/(2*pi*r/distance)
+	//chord_length = 2*r*sin(angle)
+	//we approximate by picewise linear function f, such that (l is circumference):
+	//f(0)=0, f(l/2) = l/pi (half-circle), f(l) = 0
+	//we can see that this function is symetrical by l/pi => f(x)=f(l-x)
+	//than mean we can further approximate by linear function, which will work if we will use shorter from two distances only
+	//this linear function g if therefore: g(x) = ((l/pi) / (l/2)) * x = 2*l*x/pi*l = 2*x/pi
+	//this linear function is independent of circumference
+	public static double getExpectedDisplacement(double distanceByCircumference){
+		return 2*distanceByCircumference/Math.PI;
+	}
+
+	public static double computeGreatCircleDistance(TourNode node, TourNode node1) {
+		return computeGreatCircleDistance(node.getLatitude(), node.getLongitude(), node1.getLatitude(), node1.getLongitude());
 	}
 }
