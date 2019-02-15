@@ -1,8 +1,11 @@
 package cz.matocmir.tours;
 
+import com.umotional.planningalgorithms.core.Dijkstra;
+import com.umotional.planningalgorithms.core.ShortestPathAlgorithm;
 import cz.matocmir.tours.model.*;
 import cz.matocmir.tours.utils.IOUtils;
 import cz.matocmir.tours.utils.TourUtils;
+import cz.matocmir.tours.backpath.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,8 +38,32 @@ public class Main {
 			IOUtils.visualizePath(randomCand.pathFromRoot(), "cand_path_" + i + ".geojson");
 		}
 
-		//TODO - add roundness criterium
-		//TODO - candidates probabilites edited to reflect geospatial diversity
+		getPathBack(picked.get(0), startingNode, loadedGraph,maxLength);
+
+		//TODO - backPath is now the same as forwardPath - take roundness into account
+		//TODO - filter backPaths by length and cost
+	}
+
+	private static ArrayList<TourEdge> getPathBack(Candidate candidate,TourNode startingNode, TourGraph graph, double maxLength){
+		ArrayList<TreeNode> forwardPath = candidate.correspNode.pathFromRoot();
+
+		double forwardLength = 0;
+		for(int i = 1;i<forwardPath.size();i++){
+			forwardLength += forwardPath.get(i).getEdgeFromParent().getLengthInMeters();
+			Candidate startCan = new Candidate(new TreeNode(null, null, forwardPath.get(i).getNode()), 0, 0);
+
+			BackPathGoalChecker gc = new BackPathGoalChecker(startingNode);
+			BackPathLabelFactory lf = new BackPathLabelFactory(graph, forwardLength,maxLength,startingNode);
+			BackPathLabel start = new BackPathLabel(forwardPath.get(i).getNode().getId(), new int[]{0}, null, startCan);
+
+			ShortestPathAlgorithm<BackPathLabel, BackPath> alg = new Dijkstra(lf, start,
+					gc, new BackPathFactory());
+			alg.call();
+			List<TreeNode> res = gc.getResult();
+			IOUtils.visualizePath(res, "back_" + i + ".geojson");
+		}
+
+		return null;
 	}
 
 	private static ArrayList<Candidate> forwardSearch(TourGraph graph, TourNode startNode, int minLength,
