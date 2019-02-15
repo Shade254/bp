@@ -53,6 +53,28 @@ public class IOUtils {
 		}
 	}
 
+	public static void visualizeEdges(List<TourEdge> edges, String jsonFile){
+		try(PrintStream c = new PrintStream(jsonFile)) {
+
+			c.print("{\n" + "  \"type\": \"FeatureCollection\",\n" + "  \"features\": [");
+			StringBuilder sb = new StringBuilder();
+
+			for(TourEdge edge : edges){
+				sb.append("{\n" + "      \"type\": \"Feature\",\n" + "      \"geometry\": {\n"
+						+ "        \"type\": \"LineString\",\n" + "        \"coordinates\": [");
+				sb.append(String.format("[%.5f, %.5f],", edge.getFrom().getLongitude(), edge.getFrom().getLatitude()));
+				sb.append(String.format("[%.5f, %.5f]]", edge.getTo().getLongitude(), edge.getTo().getLatitude()));
+				sb.append("},\n");
+				sb.append(String.format("\"properties\": {\n" + "        \"name\": \"%s\"\n" + "      }\n" + "    },", edge.getCost()));
+			}
+
+			c.print(sb.substring(0, sb.length() - 1));
+			c.print("]\n" + "}");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static void visualizePath(List<TreeNode> treeNodes, String jsonFile){
 		List<TourEdge> edges = treeNodes.stream().map(TreeNode::getEdgeFromParent).filter(Objects::nonNull).collect(
 				Collectors.toList());

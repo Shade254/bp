@@ -12,12 +12,14 @@ public class BackPath implements Path<Integer> {
 	List<TreeNode> fullPath;
 	int[] costVector;
 	Integer lastId;
+	double totalLength;
 
 	public BackPath(BackPathLabel label) {
 		fullPath = label.getCandidate().correspNode.pathFromRoot();
 		path = fullPath.stream().map(t -> t.getNode().getId()).collect(Collectors.toList());
 		costVector = label.getCostVector();
 		lastId = label.getObjectId();
+		totalLength = label.getCandidate().length;
 	}
 
 	@Override
@@ -37,5 +39,9 @@ public class BackPath implements Path<Integer> {
 
 	public List<TreeNode> getFullPath(){
 		return fullPath;
+	}
+
+	public double getTotalLength() {
+		return totalLength;
 	}
 }

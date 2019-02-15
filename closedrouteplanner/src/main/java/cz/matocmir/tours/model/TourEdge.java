@@ -43,6 +43,11 @@ public class TourEdge implements IEdge {
 		return ((strictness*dExp)-displacement)/(strictness*dExp);
 	}
 
+
+	public double getDisplacement(TourEdge e2){
+		return TourUtils.computeGreatCircleDistance(middle.getLatitude(), middle.getLongitude(), e2.middle.getLatitude(), e2.middle.getLongitude());
+	}
+
 	public TourNode getFrom() {
 		return from;
 	}

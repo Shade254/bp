@@ -13,12 +13,17 @@ private TourGraph graph;
 private double forwardLength;
 private double maxLength;
 private TourNode startNode;
+private List<TourEdge> forwardPath;
+private double factor;
+private double strictness = 0.8;
 
-	public BackPathLabelFactory(TourGraph graph, double forwardLength, double maxLength, TourNode startNode) {
+	public BackPathLabelFactory(TourGraph graph, double forwardLength, double maxLength, TourNode startNode, List<TourEdge> forwardPath, double factor) {
 		this.graph = graph;
 		this.maxLength = maxLength;
 		this.forwardLength = forwardLength;
 		this.startNode = startNode;
+		this.forwardPath = forwardPath;
+		this.factor = factor;
 	}
 
 	@Override
@@ -32,7 +37,7 @@ private TourNode startNode;
 					startNode, curCan.correspNode.getNode());
 
 			if (tourL<=maxLength+epsilon) {
-				Candidate nxtCan = new Candidate(new TreeNode(e, curCan.correspNode, e.getTo()),curCan.weight + countWeight(e), curCan.length + e.getLengthInMeters());
+				Candidate nxtCan = new Candidate(new TreeNode(e, curCan.correspNode, e.getTo()),curCan.weight + countWeight(e, curCan.length), curCan.length + e.getLengthInMeters());
 				BackPathLabel label = new BackPathLabel(e.getToId(), new int[]{(int)nxtCan.weight}, current, nxtCan);
 				labels.add(label);
 			}
@@ -41,7 +46,21 @@ private TourNode startNode;
 		return labels;
 	}
 
-	private double countWeight(TourEdge e) {
-		return e.getCost();
+	private double countWeight(TourEdge newEdge, double backLength) {
+		double total_distance = forwardLength+backLength+(newEdge.getLengthInMeters()/2);
+		double distance = total_distance;
+
+		double roundnessPenalty = 0;
+		for(TourEdge e : forwardPath){
+			distance -= (e.getLengthInMeters()/2);
+			double penalty = newEdge.roundnessPenalty(e, Math.min(distance, maxLength-distance), strictness);
+			roundnessPenalty += (penalty*e.getLengthInMeters()*newEdge.getLengthInMeters());
+			distance -= (e.getLengthInMeters()/2);
+		}
+
+		roundnessPenalty /= maxLength;
+		roundnessPenalty *= (2*factor);
+
+		return (newEdge.getCost() + roundnessPenalty);
 	}
 }
