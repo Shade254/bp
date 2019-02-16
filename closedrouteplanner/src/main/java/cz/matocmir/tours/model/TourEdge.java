@@ -20,32 +20,38 @@ public class TourEdge implements IEdge {
 		this.cost = cost;
 		this.length = length;
 		//TODO - fix, edges in osm graph are not straight only
-		middle = new GPSLocation((from.getLatitude()+to.getLatitude()/2), (from.getLongitude()+to.getLongitude())/2, 0, 0);
+		middle = new GPSLocation((from.getLatitude() + to.getLatitude() / 2),
+				(from.getLongitude() + to.getLongitude()) / 2, 0, 0);
 	}
 
 	public TourEdge(TourNode from, TourNode to, double cost) {
 		this.from = from;
 		this.to = to;
 		this.cost = cost;
-		length = (int)(TourUtils.computeEuclideanDistance(from.getLatitude(), from.getLongitude(), to.getLatitude(), to.getLongitude()));
+		length = (int) (TourUtils.computeEuclideanDistance(from.getLatitude(), from.getLongitude(), to.getLatitude(),
+				to.getLongitude()));
 		//TODO - fix, edges in osm graph are not straight only
-		middle = new GPSLocation((from.getLatitude()+to.getLatitude()/2), (from.getLongitude()+to.getLongitude())/2, 0, 0);
+		middle = new GPSLocation((from.getLatitude() + to.getLatitude() / 2),
+				(from.getLongitude() + to.getLongitude()) / 2, 0, 0);
 	}
 
-	public double roundnessPenalty(TourEdge e2, double distance, double strictness){
+	public double roundnessPenalty(TourEdge e2, double distance, double strictness) {
 		double dExp = TourUtils.getExpectedDisplacement(distance);
-		double displacement = TourUtils.computeGreatCircleDistance(middle.getLatitude(), middle.getLongitude(), e2.middle.getLatitude(), e2.middle.getLongitude());
+		double displacement = TourUtils
+				.computeGreatCircleDistance(middle.getLatitude(), middle.getLongitude(), e2.middle.getLatitude(),
+						e2.middle.getLongitude());
 
-		if(displacement > dExp*strictness){
+		if (displacement >= (dExp * strictness)) {
 			return 0;
 		}
 
-		return ((strictness*dExp)-displacement)/(strictness*dExp);
+		return ((strictness * dExp) - displacement) / (strictness * dExp);
 	}
 
-
-	public double getDisplacement(TourEdge e2){
-		return TourUtils.computeGreatCircleDistance(middle.getLatitude(), middle.getLongitude(), e2.middle.getLatitude(), e2.middle.getLongitude());
+	public double getDisplacement(TourEdge e2) {
+		return TourUtils
+				.computeGreatCircleDistance(middle.getLatitude(), middle.getLongitude(), e2.middle.getLatitude(),
+						e2.middle.getLongitude());
 	}
 
 	public TourNode getFrom() {
