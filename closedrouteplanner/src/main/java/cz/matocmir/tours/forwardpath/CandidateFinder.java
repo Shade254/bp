@@ -2,12 +2,13 @@ package cz.matocmir.tours.forwardpath;
 
 import com.umotional.planningalgorithms.core.Dijkstra;
 import com.umotional.planningalgorithms.core.ShortestPathAlgorithm;
-import cz.matocmir.tours.backpath.BackPathFactory;
-import cz.matocmir.tours.model.*;
-import cz.matocmir.tours.utils.TourUtils;
+import cz.matocmir.tours.model.Candidate;
+import cz.matocmir.tours.model.TourGraph;
+import cz.matocmir.tours.model.TourNode;
+import cz.matocmir.tours.model.TreeNode;
 import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class CandidateFinder {
