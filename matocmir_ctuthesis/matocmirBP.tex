@@ -1,42 +1,42 @@
 \documentclass{ctuthesis}
 \usepackage{mathtools}
 \ctusetup{
-xdoctype = B,
-xfaculty = F3,
-mainlanguage = english,
-secondlanguage = czech,
-title-english = {Planning routes for recreational cycling},
-title-czech = {Plánování tras pro rekreační cyklistiku},
-department-english = {Department of Computer Science},
-author = {Miroslav Matocha},
-supervisor = {doc. Ing. Michal Jakob, Ph.D.},
-supervisor-address = {Fakulta elektrotechnická, Resslova 307/9, Praha},
-month = 6,
-year = 2019,
-day = 6,
-keywords-english = {route planning, cycles},
-keywords-czech = {plánování cest, cykly}
+	xdoctype = B,
+	xfaculty = F3,
+	mainlanguage = english,
+	secondlanguage = czech,
+	title-english = {Planning routes for recreational cycling},
+	title-czech = {Plánování tras pro rekreační cyklistiku},
+	department-english = {Department of Computer Science},
+	author = {Miroslav Matocha},
+	supervisor = {doc. Ing. Michal Jakob, Ph.D.},
+	supervisor-address = {Fakulta elektrotechnická, Resslova 307/9, Praha},
+	month = 6,
+	year = 2019,
+	day = 6,
+	keywords-english = {route planning, cycles},
+	keywords-czech = {plánování cest, cykly}
 }
 
 \ctuprocess
 \begin{abstract-english}
-This paper is focused on problem of planning enclosed circular walks in graph constrained by length and optimizing criterion of pleassantnes. It examines various work in this field. Then from this work is chosen one state of the the art algorithm, which is described in more specific theoretical way. Introducing some particular concepts used in solution as is working with walk roundness or geospatial diversity of generated routes. Implementation of chosen algorithm is also part of this work. This implementation is further tested on various instances of problem and its results are further discussed.
+	This paper is focused on problem of planning enclosed circular walks in graph constrained by length and optimizing criterion of pleassantnes. It examines various work in this field. Then from this work is chosen one state of the the art algorithm, which is described in more specific theoretical way. Introducing some particular concepts used in solution as is working with walk roundness or geospatial diversity of generated routes. Implementation of chosen algorithm is also part of this work. This implementation is further tested on various instances of problem and its results are further discussed.
 \end{abstract-english}
 \begin{abstract-czech}
-Tato práce je zaměřená na problém nalezení kružnic v grafu, které jsou omezeny délkou a přitom optimalizují kritérium příjemnosti. Zkoumá rozličné postupy v této oblasti. Poté je vybrán specifický algoritmus, který je teoreticky rozebrán ve větším detailu. Během toho práce rozebírá několik specifických konceptů použitých při řešení problému, jako je třeba práce s kulatostí vybrané kružnice, nebo geografická diversita mezi nalezenými řešeními. Součástí této práce je také implementacevybraného algoritmu. Tato implementace je dále testována na rozličných instancích problému a její výsledky jsou diskutovány.
+	Tato práce je zaměřená na problém nalezení kružnic v grafu, které jsou omezeny délkou a přitom optimalizují kritérium příjemnosti. Zkoumá rozličné postupy v této oblasti. Poté je vybrán specifický algoritmus, který je teoreticky rozebrán ve větším detailu. Během toho práce rozebírá několik specifických konceptů použitých při řešení problému, jako je třeba práce s kulatostí vybrané kružnice, nebo geografická diversita mezi nalezenými řešeními. Součástí této práce je také implementacevybraného algoritmu. Tato implementace je dále testována na rozličných instancích problému a její výsledky jsou diskutovány.
 \end{abstract-czech}
 
 
 % Acknowledgements / Podekovani
 \begin{thanks}
-Thanks to CTU for beeing so great \emph{alma mater}.
+	Thanks to CTU for beeing so great \emph{alma mater}.
 \end{thanks}
 
 % Declaration / Prohlaseni
 \begin{declaration}
-I declare that I wrote this paper by myself and that I mentioned all used literature in bibliography section.
-
-In Prague, \ctufield{day}.~\monthinlanguage{title}~\ctufield{year}
+	I declare that I wrote this paper by myself and that I mentioned all used literature in bibliography section.
+	
+	In Prague, \ctufield{day}.~\monthinlanguage{title}~\ctufield{year}
 \end{declaration}
 
 
@@ -70,20 +70,33 @@ We introduce some notation in order to define the problem formally. Our problem 
 Input to our problem is a mentioned graph \(G=(V, E)\). One starting node \(s \in V\) and the desired length of the final cycle \(l_{des} \in \mathbb{R_+}\). It is impractical and almost impossible to aim for single number as desired length. So we will choose a parameter \(\varepsilon\) which will define interval \(L = (l_{des}-\varepsilon, l_{des}+\varepsilon)\). We will search for cycles \(C\) which fulfill \(w(C) \in L\) and \(s \in C\). And which optimizes the tour cost. This cost is derived from two components. Pleassantness of the edges themself and tour roundness which is introduced in the next section.
 	
 \section{Tour roundness}
-Another property which we are interested in is the tour roundness. We could just ban revisitng the edges, but this hard constraint could disqualify a whole range of problem solutions. For example every instance where starting point is located in dead-end street has to be treated specially. As well as instances with large neigbourhoods accessible by one edge only. These would be completely invisible to algorithm with implemented hard constraint. Instead we will describe a functional roundness metric which assigns values between 0 and 1 to every edge of the walk, this value can be later added to the minimalizing term of the algorithm.\par
-This metric is based on sinusoidal relation between displacement and distance of two point on the circle (as shown in Fig. 3.1). We obtain displacement between edges by computing distance as crown flies between two GPS locations representing their centers. We will mark this distance as \(d_{real}\). Then we will define \(d_{exp}: E^2 \rightarrow \mathbb{R_+}\) which represents the expected displacement of these centers based on distance of shortest path between these two edges. To use the sinusoidal relation to compute the \(d_{exp}\) we would need to know the final length of the tour, which is not known yet and lies somwhere in \(L\). Instead of using one of interval bounds we will choose different approach - we can approximate the relation itself to make it picewise linear. This function is then clearly symetric by \(l/2\) mark, where \(l\) stands for total circumference of the circle. In other words we get a function for which holds \(d_{exp}(x) = d_{exp}(l-x)\). This means we can always count with the shorter distance by circumference and first half of our function. The last step is to exactly count this funtion, we get \(d_{exp}(x)=2*x/{\pi}\), which means that this function is not dependent on total circumference - that is important fact for continuous resolution of tour roundness.
-We define \(d_{exp}\) for edges as well as for individual points areound the tour. The expected displacement of two edges will be defined by expected displacement of theirs middles.
+Another property which we are interested in is the tour roundness. We could just ban revisitng the edges, but this hard constraint could disqualify a whole range of problem solutions. For example every instance of the problem where starting point is located in dead-end street has to be treated specially. As well as instances with large neigbourhoods accessible by one edge only. These would be completely invisible to algorithm with implemented hard constraint. Instead we will describe a functional roundness metric which assigns value representing roundness of the whole walk, this value can be later added to the minimalizing term of the algorithm.\par
 
 \begin{figure}
-\includegraphics[width=0.4\textwidth]{displacement}
-\caption{Ilustration of distance and displacement.}
+	\includegraphics[width=0.4\textwidth]{displacement}
+	\caption{Ilustration of distance and displacement.}
 \end{figure}
 
+This metric is based on sinusoidal relation between displacement and distance of two point on the circle (as shown in Fig. 3.1). We obtain displacement between edges by computing distance as crown flies between two GPS locations representing their centers. We will mark this distance as \(d_{real}\). Then we will define \(d_{exp}: E^2 \rightarrow \mathbb{R_+}\) which represents the expected displacement of these centers based on distance of shortest path between these two edges. To use the sinusoidal relation to compute the \(d_{exp}\) we would need to know the final length of the tour, which is not known yet and lies somwhere in \(L\). Instead of using one of interval bounds we will choose different approach - we can approximate the relation itself to make it picewise linear. This function is then clearly symetric by \(\frac {l} {2}\) mark, where \(l\) stands for total circumference of the circle. In other words we get a function for which holds \(d_{exp}(x) = d_{exp}(l-x)\). This means we can always count with the shorter distance by circumference and first half of our function. The last step is to exactly count this funtion, we get \(d_{exp}(x)=\frac{2 x} {\pi}\), which means that this function is not dependent on total circumference - that is important fact for continuous resolution of tour roundness.
+We define \(d_{exp}\) for edges as well as for individual points around the tour. The expected displacement of two edges will be defined by expected displacement of theirs center points. This metric has one more important feature, it can be customized to different scales of penalization for not completely round tours. This envolves defining the cost function as \par
+
+\(
+	p(e_1, e_2) = \begin{cases}
+		\frac 
+			{\sigma d_{exp}(e_1, e_2)-d_e(e_1, e_2)}
+ 			{\sigma d_{exp}(e_1, e_2)}
+ 		& \text{if } d_e(e_1, e_2) < \sigma d_{exp}(e_1, e_2) \\
+		0  & \text{otherwise} 
+	\end{cases}
+\) \par
+Where \(d_e\) stands for actual geometric distance between center points.  \(\sigma \in [0, 1]\) parameter is called strictness and in pratcise define what is the same region for the penalisation of the algorithm. For example with sigma close the zero only the really close edges in the same path would be penalized and therefore it is not hard to find even less round solutions with penalization 0. On the other hand, \(\sigma\) set at 1 means penalizing all the edges where is their actual distance smaller than should be by expectations. Finally the total penalization for whole tour \(\pi\), \(p(\pi) = \sum_{i=0}^{N} \sum_{j=0}^{N}\frac{p(e_i, e_j)l(e_i)l(e_j)}{l(\pi)^2}\) this function should approximate the average penalty between two points randomly chosen on the tour. This also means that it gets more accurate when the number of edges and length of the tour increases.
+
+
 \chapter{Solution proposal}
-As mentioned earlier we will try to optimize two components of the cost. This means we have to fit the roundness into the optimalizing term. We will furthermore introduce factor \(\lambda\) which will basically identify the emphasis on the roundness in comparison with total cumulative cost. Our optimizing term therefore looks like this: \(w_{avg}(\pi) = c_{avg}(\pi) + \lambda * p_{avg}(\pi)\). It is easy to spot by plain sight, that \(\lambda\) close to zero will not take roundness into account much, the main component of the final cost is practically only the cost of individual edges in the walk. However greater values of \(\lambda\) can lead to another extreme where penalties for roundness overshadows edge cost and algorithm searches for perfect round tour rather than optimalizing edge cost. \par
+As mentioned earlier we will try to optimize two components of the cost. This means we have to fit the roundness into the optimalizing term. We will furthermore introduce factor \(\lambda\) which will basically identify the emphasis on the roundness in comparison with total cumulative cost. Our optimizing term therefore looks like this: \(w_{avg}(\pi) = c_{avg}(\pi) + \lambda p_{avg}(\pi)\). It is easy to spot by plain sight, that \(\lambda\) close to zero will not take roundness into account much, the main component of the final cost is practically only the cost of individual edges in the walk. However greater values of \(\lambda\) can lead to another extreme where penalties for roundness overshadows edge cost and algorithm searches for perfect round tour rather than optimalizing edge cost. \par
 The algorithm itself will run in two stages. The first stage is meant to find acceptable candidates. From this set individual candidates are picked and used for planning of the cycle. This stage mostly consists of Dijkstra search which is executed from starting node with summative edge cost used for ordering of the queue. Furthermore only nodes with combined length of path and distance from starting node smaller than upper bound of \(L\) are added to the queue. If also holds that this sum is smaller than lower bound of \(L\) node is considered as candidate. Search is complete when we encounter empty queue. The result of this first stage is set of suitable candidates for second stage.\par
 From this set we pick several candidates for second stage of the algorithm. This subset is picked with emphasis on  the best cost to length ratio and geospatial diversity of the picked candidates, because this strategy yields the best results in overall geospatial diversity of found cycles. We will get more into how to choose this candidates in the next section. For every candidate from this subset we will proceed to steps outlined in second stage of the algorithm \par
-Now when we have obtained the single candidate we will extract the path by which we got from the starting node to the picked candidate from search tree of the first stage. This path is obviously optimized by total cost. Then we will go by the path node by node and from the ones for which holds that length of the path plus its distance from starting point is in \(L\), we will run another Dijkstra search. We will denote this point as turning point \(t\). This search is targeted towards starting point and it cost function is changed to reflect not only edge cost but also the roundness of the resulting cycle. Specifically for forward path \(\pi_f\) we got edge penalty for backward Dijkstra as \(w(e) = c(e) + 2*\lambda / l_{max} * \sum_{e' \in \pi_f}{p(e, e')*l(e)*l(e')}\). This will will result in two paths \(\pi_f (\pi_{s \rightarrow t})\) and \(\pi_{t \rightarrow s}\) which together form a cycle. This cycle is optimalized to cost and roundness by parts. However we have no gurantee, that length of this cycle lies in \(L\) therefore we have to filter found cycles by this criterion and sort them by its total cost. We return only the best one as result of this second stage of the algorithm.\par
+Now when we have obtained the single candidate we will extract the path by which we got from the starting node to the picked candidate from search tree of the first stage. This path is obviously optimized by total cost. Then we will go by the path node by node and from the ones for which holds that length of the path plus its distance from starting point is in \(L\), we will run another Dijkstra search. We will denote this point as turning point \(t\). This search is targeted towards starting point and it cost function is changed to reflect not only edge cost but also the roundness of the resulting cycle. Specifically for forward path \(\pi_f\) we got edge penalty for backward Dijkstra as \(w(e) = c(e) + \frac {2 \lambda} {l_{max}} \sum_{e' \in \pi_f}{p(e, e') l(e) l(e')}\). This will will result in two paths \(\pi_f (\pi_{s \rightarrow t})\) and \(\pi_{t \rightarrow s}\) which together form a cycle. This cycle is optimalized to cost and roundness by parts. However we have no gurantee, that length of this cycle lies in \(L\) therefore we have to filter found cycles by this criterion and sort them by its total cost. We return only the best one as result of this second stage of the algorithm.\par
 We typically run the second stage several times with different candidates to obtain more than one cycle to use for multiple choice.
 
 
@@ -99,10 +112,10 @@ We typically run the second stage several times with different candidates to obt
 \chapter{Conclusion}
 Lorep ipsum \cite{stroobant}
 \begin{thebibliography}{1}
-\bibitem{stroobant}Stroobant, P., Audenaert, P., Colle, D., \& Pickavet, M. (2018). \emph{Generating constrained length personalized bicycle tours.} 4OR, 16(4), 411–439. \url{https://doi.org/10.1007/s10288-018-0371-9} 
-\bibitem{karp}Karp, R. M. (1978). \emph{A characterization of the minimum cycle mean in a digraph.} Discrete Mathematics, 23(3), 309–311. \url{https://doi.org/10.1016/0012-365x(78)90011-0} 
-\bibitem{oatsp}Maervoet, J., Brackman, P., Verbeeck, K., De Causmaecker, P., \& Vanden Berghe, G. (2013). \emph{Tour Suggestion for Outdoor Activities}. In Web and Wireless Geographical Information Systems (s. 54–63). Springer Berlin Heidelberg. \url{https://doi.org/10.1007/978-3-642-37087-8_5} 
-\bibitem{jogging}Gemsa, A., Pajor, T., Wagner, D., \& Zündorf, T. (2013). \emph{Efficient Computation of Jogging Routes.} In Experimental Algorithms (s. 272–283). Springer Berlin Heidelberg. \url{https://doi.org/10.1007/978-3-642-38527-8_25} 
-\bibitem{juraska} Juraska, J., Nykl J. (2016). \emph{Multi-criteria Route Planning with Emphasis on Geospatial Result Diversity} \url{https://www.semanticscholar.org/paper/Multi-criteria-Route-Planning-with-Emphasis-on-Juraska-Nykl/96165d905691de3b8e9b0af8b83fc2e68941b59c}
+	\bibitem{stroobant}Stroobant, P., Audenaert, P., Colle, D., \& Pickavet, M. (2018). \emph{Generating constrained length personalized bicycle tours.} 4OR, 16(4), 411–439. \url{https://doi.org/10.1007/s10288-018-0371-9} 
+	\bibitem{karp}Karp, R. M. (1978). \emph{A characterization of the minimum cycle mean in a digraph.} Discrete Mathematics, 23(3), 309–311. \url{https://doi.org/10.1016/0012-365x(78)90011-0} 
+	\bibitem{oatsp}Maervoet, J., Brackman, P., Verbeeck, K., De Causmaecker, P., \& Vanden Berghe, G. (2013). \emph{Tour Suggestion for Outdoor Activities}. In Web and Wireless Geographical Information Systems (s. 54–63). Springer Berlin Heidelberg. \url{https://doi.org/10.1007/978-3-642-37087-8_5} 
+	\bibitem{jogging}Gemsa, A., Pajor, T., Wagner, D., \& Zündorf, T. (2013). \emph{Efficient Computation of Jogging Routes.} In Experimental Algorithms (s. 272–283). Springer Berlin Heidelberg. \url{https://doi.org/10.1007/978-3-642-38527-8_25} 
+	\bibitem{juraska} Juraska, J., Nykl J. (2016). \emph{Multi-criteria Route Planning with Emphasis on Geospatial Result Diversity} \url{https://www.semanticscholar.org/paper/Multi-criteria-Route-Planning-with-Emphasis-on-Juraska-Nykl/96165d905691de3b8e9b0af8b83fc2e68941b59c}
 \end{thebibliography}
 \end{document}
