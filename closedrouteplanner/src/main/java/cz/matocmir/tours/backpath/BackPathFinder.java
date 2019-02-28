@@ -23,7 +23,7 @@ public class BackPathFinder {
 	}
 
 	public ArrayList<TourEdge> getPathBack(Candidate candidate, TourNode startingNode, double maxLength,
-			double minLength) {
+			double minLength, double factor, double strictness) {
 		ArrayList<TreeNode> forwardPath = candidate.correspNode.pathFromRoot();
 
 		ArrayList<TourEdge> partialForwardPath = new ArrayList<>();
@@ -51,7 +51,7 @@ public class BackPathFinder {
 			BackPathGoalChecker gc = new BackPathGoalChecker(startingNode);
 			BackPathLabelFactory lf = new BackPathLabelFactory(graph, forwardLength, maxLength, startingNode,
 					forwardPath.stream().map(TreeNode::getEdgeFromParent).filter(Objects::nonNull)
-							.collect(Collectors.toList()), 1.2);
+							.collect(Collectors.toList()), factor, strictness);
 
 			BackPathLabel start = new BackPathLabel(forwardPath.get(i).getNode().getId(), new int[] { 0 }, null,
 					startCan);

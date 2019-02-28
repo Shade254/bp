@@ -1,0 +1,24 @@
+Enter desired length (in  m): 
+>9000
+Enter maximum deviation (in  %): 
+>20
+Enter starting node id: 
+>28350
+Running forward search in interval 7200 - 10800 m
+Found: 996 candidates
+Enter num of cycles: 
+>5
+Enter strictness: 
+>1
+Enter factor: 
+>250
+Finding back path from node 29503
+Finding back path from node 68009
+Finding back path from node 33877
+Walk not found
+Finding back path from node 74483
+Finding back path from node 1896
+Walk not found
+Finding back path from node 17859
+Finding back path from node 65179
+All cycles found

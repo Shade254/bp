@@ -48,7 +48,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>cz.matocmir.tours.Main</mainClass>
+                            <mainClass>cz.matocmir.tours.ClosedTourMain</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
