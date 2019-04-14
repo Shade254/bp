@@ -1,9 +1,7 @@
 package cz.matocmir.tours.api;
 
 import com.umotional.basestructures.BoundingBox;
-import cz.matocmir.tours.model.TourEdge;
-import cz.matocmir.tours.model.TourNode;
-import cz.matocmir.tours.model.TourRequest;
+import cz.matocmir.tours.model.*;
 import cz.matocmir.tours.utils.IOUtils;
 import javafx.util.Pair;
 import org.apache.log4j.Logger;
@@ -28,7 +26,7 @@ public class PlannerAPI {
 			@DefaultValue("-1") @QueryParam("factor") Double factor) {
 
 		TourRequest request = new TourRequest(startId, -1, factor, strictness, minLength, maxLength);
-		Pair<List<TourNode>, List<List<TourEdge>>> result = null;
+		TourResponse result = null;
 
 		try {
 			result = service.getClosedTours(request, toursNumber);
@@ -37,11 +35,11 @@ public class PlannerAPI {
 			return Response.status(400).build();
 		}
 
-		if (result == null || result.getKey().isEmpty()) {
+		if (result == null || result.getTours().length == 0) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 
-		return Response.status(200).entity(toursToGeojson(result.getValue(), result.getKey())).build();
+		return Response.status(200).entity(result).build();
 	}
 
 	@GET
@@ -54,7 +52,7 @@ public class PlannerAPI {
 			@DefaultValue("-1") @QueryParam("factor") Double factor) {
 
 		TourRequest request = new TourRequest(startId, goalId, factor, strictness, minLength, maxLength);
-		Pair<List<TourNode>, List<List<TourEdge>>> result = null;
+		TourResponse result = null;
 		try {
 			result = service.getP2PTours(request, toursNumber);
 		} catch (IllegalArgumentException e) {
@@ -62,11 +60,11 @@ public class PlannerAPI {
 			return Response.status(400).build();
 		}
 
-		if (result == null || result.getKey().isEmpty()) {
+		if (result == null || result.getTours().length == 0) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 
-		return Response.status(200).entity(toursToGeojson(result.getValue(), result.getKey())).build();
+		return Response.status(200).entity(result).build();
 	}
 
 	@GET
@@ -124,7 +122,7 @@ public class PlannerAPI {
 			String edgesVis = IOUtils.visualizeEdges(edges.get(i));
 			int end = edgesVis.lastIndexOf("]");
 			edgesVis = edgesVis.substring(0, end);
-			edgesVis += ", " + IOUtils.nodeToFeature(turningPoints.get(i));
+			edgesVis += ", " + IOUtils.nodeToFeatureString(turningPoints.get(i));
 			edgesVis += "]\n" + "}";
 			sb.append(edgesVis);
 			sb.append(",");

@@ -171,7 +171,15 @@
 			</table>
 		</div>
 		
-		
+
+		<h3>Tour stats:</h3>
+		<div align="left">
+		<div id="timeInfo">Response time - </div>
+		<div id="lengthInfo">Length - </div>
+		<div id="roundnessInfo">Roundness - </div>
+		<div id="totalInfo">Total cost - </div>
+		</div>
+
 	</div>
 
 	<div id='map' class='map pad2'>
@@ -180,7 +188,11 @@
 		</select>
 	</div>
 <script>
+	var port = 8080;
+
+	// flag of choosed planning mode(closed, p2p)
 	var which;
+	
 	var fromId;
 	var toId;
 	var fromLat;
@@ -191,15 +203,27 @@
 	var markerFrom;
   	var markerTo;
 
+  	mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhZGUyNTQiLCJhIjoiY2p0Ym44b3diMG1hczQzcDhlMWhiM203OCJ9.5aB7eFT6mMTBGqt_7QSr-A';
+
+  	var map = new mapboxgl.Map({
+		container: "map",
+		style: "mapbox://styles/mapbox/outdoors-v9",
+		center: [14.45, 50.08],
+		zoom: 10
+	});
+
   	document.getElementById("closedTourButton").click();
 
+  	// switching tabs
 	function openTab(evt, tourName) {
+  		
   		// Declare all variables
   		var i, tabcontent, tablinks;
   		fromLon = null;
   		fromLat = null;
   		toLon = null;
   		toLat = null;
+  		
   		document.getElementById("p2pGoal").value = "";
 		document.getElementById("p2pStart").value = "";
 		document.getElementById("closedStart").value = "";
@@ -236,49 +260,20 @@
 
 	}
 
-	mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhZGUyNTQiLCJhIjoiY2p0Ym44b3diMG1hczQzcDhlMWhiM203OCJ9.5aB7eFT6mMTBGqt_7QSr-A';
-
-	var map = new mapboxgl.Map({
-		container: "map",
-		style: "mapbox://styles/mapbox/outdoors-v9",
-		center: [14.45, 50.08],
-		zoom: 10
-	});
-
-	var request = new XMLHttpRequest()
-
-	request.onload = function () {
-		console.log(request.status)
-		if(request.status == 200){
-			var data = JSON.parse(this.response)
-			console.log(data);
-
-			var select = document.getElementById("routes");
-
-    		for(var i = select.options.length - 1 ; i >= 0 ; i--){
-        		select.remove(i);
-    		}
-
-    		for(var i = data.length; i>0 ; --i) {
-        		var option = document.createElement('option');
-        		option.text = option.value = i;
-        		select.add(option, 0);
-    		}
-
-			map.getSource('closedwalk').setData(data[0])
-			select.value = 1
-			select.onchange=function(e){
-				map.getSource('closedwalk').setData(data[parseInt(e.target.value)-1])
-			}
-		} else {
-			console.log(this.response)
-			alert("Not found, try again")
-		}
-	}
-
- 
+	// load empty sources and layer styles to the map - ready for data to be filled in
+ 	// also loads borders of the graph from the server 
 	map.on("load", function() {
 		map.addSource("closedwalk", {"type":"geojson", "data":{
+  			"type": "FeatureCollection",
+  			"features": []
+		}});
+
+		map.addSource("usedpoint", {"type":"geojson", "data":{
+  			"type": "FeatureCollection",
+  			"features": []
+		}});
+
+		map.addSource("lastpoint", {"type":"geojson", "data":{
   			"type": "FeatureCollection",
   			"features": []
 		}});
@@ -299,12 +294,23 @@
 		});
 
 		map.addLayer({
-			"id": "turningPoint",
+			"id": "turningPointLast",
 			"type": "circle",
-			"source": "closedwalk",
+			"source": "lastpoint",
 			"paint": {
 				"circle-radius": 6,
 				"circle-color": "#0000FF"
+			},
+			"filter": ["==", "$type", "Point"],
+		});
+
+		map.addLayer({
+			"id": "turningPointUsed",
+			"type": "circle",
+			"source": "usedpoint",
+			"paint": {
+				"circle-radius": 6,
+				"circle-color": "#00FF00"
 			},
 			"filter": ["==", "$type", "Point"],
 		});
@@ -339,11 +345,57 @@
 			}
 		}
 
-		borderRequest.open('GET', 'http://localhost:8888/border', true)
+		borderRequest.open('GET', 'http://localhost:'+ port +'/border', true)
 		borderRequest.send()
 	});
 
+	// handling basic response from the server
+	// this response contains individual tours for display as well as metadata about length, roundness, etc.
+	var request = new XMLHttpRequest()
+	request.onload = function () {
+		console.log(request.status)
+		if(request.status == 200){
+			var data = JSON.parse(this.response)
+			console.log(data);
 
+			var select = document.getElementById("routes");
+
+    		for(var i = select.options.length - 1 ; i >= 0 ; i--){
+        		select.remove(i);
+    		}
+
+    		for(var i = data.tours.length; i>0 ; --i) {
+        		var option = document.createElement('option');
+        		option.text = option.value = i;
+        		select.add(option, 0);
+    		}
+			document.getElementById("timeInfo").innerHTML = "Response time - " + data.responseTime + " ms";
+
+			map.getSource('closedwalk').setData(data.tours[0].path)
+			map.getSource('usedpoint').setData(data.tours[0].turningPointPlanned)
+			map.getSource('lastpoint').setData(data.tours[0].turningPointLast)
+			document.getElementById("lengthInfo").innerHTML = "Length - " + data.tours[0].length + " m";
+			document.getElementById("roundnessInfo").innerHTML = "Roundness - " + parseFloat(data.tours[0].roundness).toFixed(5);
+			document.getElementById("totalInfo").innerHTML = "Total cost - " + data.tours[0].totalCost;
+			select.value = 1
+			
+			select.onchange=function(e){
+				map.getSource('closedwalk').setData(data.tours[parseInt(e.target.value)-1].path)
+				map.getSource('usedpoint').setData(data.tours[parseInt(e.target.value)-1].turningPointPlanned)
+				map.getSource('lastpoint').setData(data.tours[parseInt(e.target.value)-1].turningPointLast)
+				document.getElementById("lengthInfo").innerHTML = "Length - " + data.tours[parseInt(e.target.value)-1].length + " m";
+				document.getElementById("roundnessInfo").innerHTML = "Roundness - " + parseFloat(data.tours[parseInt(e.target.value)-1].roundness).toFixed(5);
+				document.getElementById("totalInfo").innerHTML = "Total cost - " + data.tours[parseInt(e.target.value)-1].totalCost;
+
+			}
+		} else {
+			console.log(this.response)
+			alert("Not found, try again")
+		}
+	}
+
+
+	// when user clicks in the map, map its location to the nearest node(on server), put marker there and set it as origin or destination
 	map.on('click', function (e){
 		var mapRequest = new XMLHttpRequest();
 		mapRequest.onload = function(){
@@ -381,8 +433,6 @@
   					markerTo.remove();
   				}
 
-				console.log(fromLat + ', ' + fromLon);
-
 				if(fromLat !== null && fromLon !== null){
 					var el = document.createElement('div');
   					el.className = 'marker';
@@ -403,8 +453,7 @@
 
 
 		}
-		console.log(e.lngLat.lat + ', ' + e.lngLat.lng);
-		var url = 'http://localhost:8888/map?lat=' + e.lngLat.lat + '&lon=' + e.lngLat.lng;
+		var url = 'http://localhost:'+port+'/map?lat=' + e.lngLat.lat + '&lon=' + e.lngLat.lng;
 		mapRequest.open('GET', url, true)
 		mapRequest.send()
 		console.log(url)
@@ -412,6 +461,7 @@
 </script>
 
 <script type="text/javascript">
+		// collect info from input fields and send it to the server
 		function submitClick(){
 			var minL, maxL, start, goal, factor, strict, tours;
 			if(which == 1){
@@ -435,9 +485,9 @@
 
 
 			if(which == 1){
-				url = 'http://localhost:8888/closed?start='+start+'&minLength='+minL+'&maxLength='+maxL;
+				url = 'http://localhost:'+port+'/closed?start='+start+'&minLength='+minL+'&maxLength='+maxL;
 			} else {
-				url = 'http://localhost:8888/p2p?start='+start+'&goal='+goal+'&minLength='+minL+'&maxLength='+maxL;
+				url = 'http://localhost:'+port+'/p2p?start='+start+'&goal='+goal+'&minLength='+minL+'&maxLength='+maxL;
 			}
 			
 			if(!isNaN(factor)){

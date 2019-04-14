@@ -8,7 +8,6 @@ import cz.matocmir.tours.forwardpath.CandidateFinder;
 import cz.matocmir.tours.forwardpath.CandidatesPicker;
 import cz.matocmir.tours.model.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TourUtils {
@@ -115,12 +114,12 @@ public class TourUtils {
 			}
 
 			BackPathFinder backFinder = new BackPathFinder(graph);
-			ArrayList<TourEdge> pathBack = backFinder.getCompletedPath(c, request);
-			if (pathBack == null) {
+			Tour pathBack = backFinder.getCompletedPath(c, request);
+			if (pathBack == null || pathBack.getOriginalEdges() == null || pathBack.getOriginalEdges().isEmpty()) {
 				continue;
 			}
 
-			double penalty = tourPenalty(pathBack, getPathLength(pathBack));
+			double penalty = tourPenalty(pathBack.getOriginalEdges(), getPathLength(pathBack.getOriginalEdges()));
 			//System.out.println("Penalty for candidate " + c.correspNode.getNode() + "\nis " + penalty);
 			cummulativePenalty += penalty;
 			foundCycles++;

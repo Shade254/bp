@@ -9,7 +9,6 @@ import cz.matocmir.tours.forwardpath.CandidateFinder;
 import cz.matocmir.tours.forwardpath.CandidatesPicker;
 import cz.matocmir.tours.model.*;
 import cz.matocmir.tours.utils.TourNodeResolver;
-import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class PlannerService {
-	private static final String PATH_TO_GRAPH = "./src/main/resources/prague2.csv";
+	private static final String PATH_TO_GRAPH = "./src/main/resources/prague_min.csv";
 	private static final Logger log = Logger.getLogger(PlannerService.class);
 	private static final int DEFAULT_TOURS_NUM = 5;
 
@@ -50,9 +49,10 @@ public class PlannerService {
 		return graphBorders;
 	}
 
-	public Pair<List<TourNode>, List<List<TourEdge>>> getClosedTours(TourRequest request, int toursNumber)
-			throws IllegalArgumentException {
+	public TourResponse getClosedTours(TourRequest request, int toursNumber) throws IllegalArgumentException {
 		log.info("Starting CLOSED for request " + request.toString());
+		long stopwatch = System.currentTimeMillis();
+		TourResponse response = new TourResponse();
 
 		List<Candidate> cands = candFinder.forwardSearch(request);
 
@@ -72,27 +72,20 @@ public class PlannerService {
 			toursNumber = DEFAULT_TOURS_NUM;
 
 		int foundCycles = 0;
-		List<List<TourEdge>> response = new ArrayList<>();
-		List<TourNode> turningPoints = new ArrayList<>();
-		List<TourEdge> foundPath;
-		int percentage = 10;
+		List<Tour> paths = new ArrayList<>();
+		Tour foundPath;
 
 		for (int i = 0; i < cands.size(); i++) {
 			Candidate randomCand = candidatesPicker.selectCandidate();
-
-			if (i > cands.size() / 100 * percentage) {
-				System.out.println(percentage + "% of nodes searched");
-				percentage += 10;
-			}
 
 			if (randomCand == null || randomCand.correspNode == null)
 				continue;
 
 			foundPath = backPathFinder.getCompletedPath(randomCand, request);
 
-			if (foundPath != null) {
-				response.add(foundPath);
-				turningPoints.add(randomCand.correspNode.getNode());
+			if (foundPath != null && foundPath.getOriginalEdges() != null && !foundPath.getOriginalEdges().isEmpty()) {
+				System.out.println(paths.size() + ". path to goal found");
+				paths.add(foundPath);
 				foundCycles++;
 			}
 
@@ -102,15 +95,18 @@ public class PlannerService {
 			}
 		}
 
-		return new Pair<>(turningPoints, response);
+		response.setResponseTime(System.currentTimeMillis() - stopwatch);
+		response.setTours(paths.toArray(new Tour[0]));
+
+		return response;
 	}
 
-	public Pair<List<TourNode>, List<List<TourEdge>>> getP2PTours(TourRequest request, int toursNumber)
-			throws IllegalArgumentException {
+	public TourResponse getP2PTours(TourRequest request, int toursNumber) throws IllegalArgumentException {
 		log.info("Starting P2P for request " + request.toString());
+		long stopwatch = System.currentTimeMillis();
+		TourResponse response = new TourResponse();
 
-		List<List<TourEdge>> result = new ArrayList<>();
-		List<TourNode> usedTurningPoints = new ArrayList<>();
+		List<Tour> result = new ArrayList<>();
 
 		TourNode startNode = graph.getNode(request.getStartNode());
 		if (startNode == null)
@@ -134,34 +130,30 @@ public class PlannerService {
 
 		int foundWalks = 1;
 		CandidatesPicker picker = new CandidatesPicker(turningPoints, lon, lat, request.getMaxLength());
-		int percentage = 10;
 		for (int i = 1; i < turningPoints.size(); i++) {
 			Candidate turningPoint = picker.selectCandidate();
-
-			if (i > turningPoints.size() / 100 * percentage) {
-				System.out.println(percentage + "% of nodes searched");
-				percentage += 10;
-			}
-
 			if (turningPoint == null || turningPoint.correspNode == null) {
 				continue;
 			}
 
-			Pair<TourNode, List<TourEdge>> tour = backPathFinder.getBestPathBack(turningPoint, request);
-			if (tour.getValue() != null && !tour.getValue().isEmpty()) {
+			Tour tour = backPathFinder.getBestPathBack(turningPoint, request);
+			if (tour != null && tour.getOriginalEdges() != null && !tour.getOriginalEdges().isEmpty()) {
 				System.out.println(foundWalks + ". path to goal found");
-				result.add(tour.getValue());
-				usedTurningPoints.add(tour.getKey());
+				result.add(tour);
 				foundWalks++;
 			}
 
 			if (foundWalks >= toursNumber) {
-				return new Pair<>(usedTurningPoints, result);
+				log.info("All cycles found");
+				break;
 			}
 
 		}
 
-		return new Pair<>(usedTurningPoints, result);
+		response.setResponseTime(System.currentTimeMillis() - stopwatch);
+		response.setTours(result.toArray(new Tour[0]));
+
+		return response;
 	}
 
 }

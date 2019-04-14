@@ -1,5 +1,8 @@
 package cz.matocmir.tours.utils;
 
+import com.umotional.geotools.geojson.Feature;
+import com.umotional.geotools.geojson.Geometry;
+import com.umotional.geotools.geojson.Type;
 import cz.matocmir.tours.model.TourEdge;
 import cz.matocmir.tours.model.TourNode;
 import cz.matocmir.tours.model.TreeNode;
@@ -53,7 +56,7 @@ public class IOUtils {
 		return finalString;
 	}
 
-	public static String nodeToFeature(TourNode node) {
+	public static String nodeToFeatureString(TourNode node) {
 		String template = "{\n" + "  \"type\": \"Feature\",\n" + "  \"geometry\": {\n" + "    \"type\": \"Point\",\n"
 				+ "    \"coordinates\": [%.5f, %.5f]\n" + "  },\n" + "  \"properties\": {\n" + "    \"name\": \"%s\"\n"
 				+ "  }\n" + "}";
@@ -93,5 +96,13 @@ public class IOUtils {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static Feature nodeToFeature(TourNode node){
+		return new Feature(Type.Feature, new Geometry(Type.Point, new Double[]{node.getLongitude(), node.getLatitude()}), null);
+	}
+
+	public static Feature edgeToFeature(TourEdge e){
+		return new Feature(Type.Feature, new Geometry(Type.LineString, new Object[]{new Double[]{e.getFrom().getLongitude(), e.getFrom().getLatitude()}, new Double[]{e.getTo().getLongitude(), e.getTo().getLatitude()}}), null);
 	}
 }

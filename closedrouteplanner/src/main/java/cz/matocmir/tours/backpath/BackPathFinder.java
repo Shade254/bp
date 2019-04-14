@@ -24,13 +24,16 @@ public class BackPathFinder {
 		this.graph = graph;
 	}
 
-	public ArrayList<TourEdge> getCompletedPath(Candidate candidate, TourRequest request) {
+	public Tour getCompletedPath(Candidate candidate, TourRequest request) {
+		Tour response = null;
+
 		TourNode startingNode = graph.getNode(request.getStartNode());
 		ArrayList<TreeNode> forwardPath = candidate.correspNode.pathFromRoot();
 		ArrayList<TourEdge> partialForwardPath = new ArrayList<>();
 
 		ArrayList<TourEdge> bestPath = null;
 		double bestScore = Double.MAX_VALUE;
+		TourNode bestUsed = null;
 
 		double forwardLength = 0;
 		double forwardCost = 0;
@@ -57,15 +60,19 @@ public class BackPathFinder {
 					&& (forwardLength + bp.getTotalLength()) >= request.getMinLength() + epsilon) {
 				if (forwardCost + bp.getCostVector()[0] < bestScore) {
 					bestScore = forwardCost + bp.getCostVector()[0];
-					bestPath = new ArrayList<>();
-					bestPath.addAll(partialForwardPath);
+					bestPath = new ArrayList<>(partialForwardPath);
 					List<TourEdge> backPath = bp.getExactPath();
 					bestPath.addAll(backPath);
+					bestUsed = forwardPath.get(i).getNode();
 				}
 			}
 		}
 
-		return bestPath;
+		if(bestPath != null){
+			response = new Tour(bestPath, candidate.correspNode.getNode(), bestUsed, bestScore);
+		}
+
+		return response;
 	}
 
 	private BackPath getPathsWithRoundness(TourRequest request, TourNode start, double forwardLength,
@@ -103,7 +110,8 @@ public class BackPathFinder {
 		return res.get(0);
 	}
 
-	public Pair<TourNode, List<TourEdge>> getBestPathBack(Candidate lastTurningPoint, TourRequest request) {
+	public Tour getBestPathBack(Candidate lastTurningPoint, TourRequest request) {
+		Tour response = null;
 		ArrayList<TreeNode> forwardPath = lastTurningPoint.correspNode.pathFromRoot();
 		ArrayList<TourEdge> partialForwardPath = new ArrayList<>();
 
@@ -145,8 +153,11 @@ public class BackPathFinder {
 
 			}
 		}
+		if(bestPath != null){
+			response = new Tour(bestPath, lastTurningPoint.correspNode.getNode(), bestTurningPoint, bestScore);
+		}
 
-		return new Pair<>(lastTurningPoint.correspNode.getNode(), bestPath);
+		return response;
 	}
 
 }
