@@ -7,6 +7,9 @@ public class TourNode implements INode {
 	private double lon;
 	private int id;
 
+	public TourNode() {
+	}
+
 	public TourNode(double lat, double lon, int id) {
 		this.lat = lat;
 		this.lon = lon;
@@ -31,5 +34,10 @@ public class TourNode implements INode {
 	@Override
 	public int getElevationInMillimeters() {
 		return -1;
+	}
+
+	@Override
+	public String toString() {
+		return "TourNode{" + "lat=" + lat + ", lon=" + lon + ", id=" + id + '}';
 	}
 }

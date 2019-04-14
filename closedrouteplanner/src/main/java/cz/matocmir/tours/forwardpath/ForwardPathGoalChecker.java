@@ -1,22 +1,18 @@
 package cz.matocmir.tours.forwardpath;
 
 import com.umotional.planningalgorithms.core.GoalChecker;
-import cz.matocmir.tours.model.Candidate;
 import cz.matocmir.tours.model.TourNode;
 import cz.matocmir.tours.model.TreeNode;
 import cz.matocmir.tours.utils.TourUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ForwardPathGoalChecker implements GoalChecker<ForwardPathLabel> {
-	private int minLength;
-	private TourNode startNode;
+	private double minLength;
+	private TourNode goalNode;
 	private static final double epsilon = 0.001;
 
-	public ForwardPathGoalChecker(int minLength, TourNode startNode) {
+	public ForwardPathGoalChecker(double minLength, TourNode goalNode) {
 		this.minLength = minLength;
-		this.startNode = startNode;
+		this.goalNode = goalNode;
 	}
 
 	@Override
@@ -26,7 +22,7 @@ public class ForwardPathGoalChecker implements GoalChecker<ForwardPathLabel> {
 		double minlenMinCurlen = minLength - current.getCandidate().length;
 		double distance = TourUtils
 				.computeGreatCircleDistance(curN.getNode().getLatitude(), curN.getNode().getLongitude(),
-						startNode.getLatitude(), startNode.getLongitude());
+						goalNode.getLatitude(), goalNode.getLongitude());
 		return (minlenMinCurlen < 0 || distance + epsilon >= minlenMinCurlen);
 
 	}

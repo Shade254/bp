@@ -1,38 +1,60 @@
 package cz.matocmir.tours.forwardpath;
 
 import com.umotional.planningalgorithms.core.Dijkstra;
+import com.umotional.planningalgorithms.core.LabelFactory;
 import com.umotional.planningalgorithms.core.ShortestPathAlgorithm;
-import cz.matocmir.tours.model.Candidate;
-import cz.matocmir.tours.model.TourGraph;
-import cz.matocmir.tours.model.TourNode;
-import cz.matocmir.tours.model.TreeNode;
+import cz.matocmir.tours.model.*;
 import org.apache.log4j.Logger;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class CandidateFinder {
 	private final Logger log = Logger.getLogger(CandidateFinder.class);
-	private final double epsilon = 0.001;
 	private TourGraph graph;
 
 	public CandidateFinder(TourGraph graph) {
 		this.graph = graph;
 	}
 
-	public List<Candidate> forwardSearch(TourNode startNode, int minLength, int maxLength) {
-		Candidate startCan = new Candidate(new TreeNode(null, null, startNode), 0, 0);
-		ForwardPathGoalChecker gc = new ForwardPathGoalChecker(minLength, startNode);
-		ForwardPathLabelFactory labelFactory = new ForwardPathLabelFactory(graph, maxLength, startNode);
-		ForwardPathLabel start = new ForwardPathLabel(startNode.getId(), new int[] { 0 }, null, startCan);
+	public List<Candidate> forwardSearch(TourRequest request) throws IllegalArgumentException {
+		TourNode start = graph.getNode(request.getStartNode());
+		TourNode goal = graph.getNode(request.getGoalNode());
+		boolean p2p = false;
+		if (start == null) {
+			throw new IllegalArgumentException("Start or goal node not in graph");
+		}
 
-		ShortestPathAlgorithm<ForwardPathLabel, ForwardPath> alg = new Dijkstra(labelFactory, start, gc,
+		if (goal != null) {
+			p2p = true;
+		} else {
+			goal = start;
+		}
+
+		Candidate startCan = new Candidate(new TreeNode(null, null, start), 0, 0);
+		ForwardPathGoalChecker gc = new ForwardPathGoalChecker(request.getMinLength(), goal);
+		ForwardPathLabel startLabel = new ForwardPathLabel(start.getId(), new int[] { 0 }, null, startCan);
+		LabelFactory<ForwardPathLabel> labelFactory;
+
+		if (p2p) {
+			labelFactory = new Point2PointLabelFactory(graph, goal.getId(), request.getMaxLength());
+		} else {
+			labelFactory = new ClosedLabelFactory(graph, request.getMaxLength(), goal);
+		}
+
+		ShortestPathAlgorithm<ForwardPathLabel, ForwardPath> alg = new Dijkstra(labelFactory, startLabel, gc,
 				new ForwardPathFactory());
 		List<ForwardPath> results = alg.call();
-		List<Candidate> candidates = results.stream().map(p -> p.getLastLabelObjId().getCandidate())
-				.collect(Collectors.toList());
-		candidates.addAll(labelFactory.getBoundaryNodes());
+		List<Candidate> unfiltered = results.stream().sorted(Comparator.comparingInt(p -> p.getCostVector()[0]))
+				.map(r -> r.getLastLabelObjId().getCandidate()).collect(Collectors.toList());
 
-		return candidates;
+		if (p2p) {
+			unfiltered.addAll(((Point2PointLabelFactory) labelFactory).getBoundaryNodes());
+		} else {
+			unfiltered.addAll(((ClosedLabelFactory) labelFactory).getBoundaryNodes());
+		}
+
+		return unfiltered;
 	}
 }

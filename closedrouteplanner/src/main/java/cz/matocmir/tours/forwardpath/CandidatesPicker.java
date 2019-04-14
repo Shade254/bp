@@ -13,14 +13,16 @@ public class CandidatesPicker {
 	private double[] distances;
 	private double[] unpleasantnesses;
 	private Random r;
-	private TourNode center;
+	private double centerLat;
+	private double centerLon;
 	private double minLength;
 
-	public CandidatesPicker(List<Candidate> candidates, TourNode center, double minLength) {
+	public CandidatesPicker(List<Candidate> candidates, double centerLon, double centerLat, double minLength) {
 		this.candidates = candidates;
 		this.probabilities = new double[candidates.size()];
 		this.r = new Random();
-		this.center = center;
+		this.centerLat = centerLat;
+		this.centerLon = centerLon;
 		this.minLength = minLength;
 
 		distances = new double[candidates.size()];
@@ -145,12 +147,8 @@ public class CandidatesPicker {
 					probabilities[i] *= 1 - (1 - y) * Math.exp(b * (x - distances[i] / maxDistance));
 			}
 		}
-		double lonScale = TourUtils
-				.computeGreatCircleDistance(center.getLatitude(), center.getLongitude(), center.getLatitude(),
-						center.getLongitude() + 1);
-		double latScale = TourUtils
-				.computeGreatCircleDistance(center.getLatitude(), center.getLongitude(), center.getLatitude() + 1,
-						center.getLongitude() + 1);
+		double lonScale = TourUtils.computeGreatCircleDistance(centerLat, centerLon, centerLat, centerLon + 1);
+		double latScale = TourUtils.computeGreatCircleDistance(centerLat, centerLon, centerLat + 1, centerLon + 1);
 
 		// Density
 		double latTile = 0.05 * minLength / latScale, lonTile = 0.05 * minLength / lonScale;

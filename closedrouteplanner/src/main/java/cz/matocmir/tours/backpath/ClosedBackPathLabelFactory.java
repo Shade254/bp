@@ -3,12 +3,14 @@ package cz.matocmir.tours.backpath;
 import com.umotional.planningalgorithms.core.LabelFactory;
 import cz.matocmir.tours.model.*;
 import cz.matocmir.tours.utils.TourUtils;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class BackPathLabelFactory implements LabelFactory<BackPathLabel> {
+public class ClosedBackPathLabelFactory implements LabelFactory<BackPathLabel> {
+	private static final Logger log = Logger.getLogger(ClosedBackPathLabelFactory.class);
 	private static final double epsilon = 0.001;
 	private TourGraph graph;
 	private double forwardLength;
@@ -18,12 +20,12 @@ public class BackPathLabelFactory implements LabelFactory<BackPathLabel> {
 	private double factor;
 	private double strictness = 0.8;
 
-	public BackPathLabelFactory(TourGraph graph, double forwardLength, double maxLength, TourNode startNode,
+	public ClosedBackPathLabelFactory(TourGraph graph, double forwardLength, double maxLength, TourNode goalNode,
 			List<TourEdge> forwardPath, double factor, double strictness) {
 		this.graph = graph;
 		this.maxLength = maxLength;
 		this.forwardLength = forwardLength;
-		this.startNode = startNode;
+		this.startNode = goalNode;
 		this.forwardPath = forwardPath;
 		this.factor = factor;
 		this.strictness = strictness;
@@ -31,6 +33,7 @@ public class BackPathLabelFactory implements LabelFactory<BackPathLabel> {
 
 	@Override
 	public List<BackPathLabel> successorsOf(BackPathLabel current) {
+
 		Candidate curCan = current.getCandidate();
 		List<TourEdge> outEdges = graph.getOutEdges(curCan.correspNode.getNode().getId());
 		List<BackPathLabel> labels = new ArrayList<>();
@@ -43,8 +46,9 @@ public class BackPathLabelFactory implements LabelFactory<BackPathLabel> {
 		}
 
 		for (TourEdge e : outEdges) {
-			Candidate nxtCan = new Candidate(new TreeNode(e, curCan.correspNode, e.getTo()),
-					curCan.weight + countWeight(e, curCan.length), curCan.length + e.getLengthInMeters());
+			double weight = countWeight(e, curCan.length);
+			Candidate nxtCan = new Candidate(new TreeNode(e, curCan.correspNode, e.getTo()), curCan.weight + weight,
+					curCan.length + e.getLengthInMeters());
 			BackPathLabel label = new BackPathLabel(e.getToId(), new int[] { (int) nxtCan.weight }, current, nxtCan);
 			labels.add(label);
 		}
@@ -57,15 +61,12 @@ public class BackPathLabelFactory implements LabelFactory<BackPathLabel> {
 		double distance = total_distance;
 
 		double roundnessPenalty = 0;
-
 		for (TourEdge e : forwardPath) {
 			distance -= (e.getLengthInMeters() / 2);
 			double penalty = newEdge.roundnessPenalty(e, Math.min(distance, maxLength - distance), strictness);
 			roundnessPenalty += (penalty * e.getLengthInMeters() * newEdge.getLengthInMeters());
 			distance -= (e.getLengthInMeters() / 2);
 		}
-
-		//TODO - add used back path to the penalty
 
 		roundnessPenalty /= maxLength;
 		roundnessPenalty *= (2 * factor);

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<title>Closedroute planner</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
+
+<style>
+	body {
+  		background: #404040;
+  		color: #f8f8f8;
+  		font: 500 20px/26px 'Helvetica Neue', Helvetica, Arial, Sans-serif;
+  		margin: 0;
+  		padding: 0;
+  		-webkit-font-smoothing: antialiased;
+	}
+
+	.marker {
+  		background-image: url('marker.png');
+  		background-size: cover;
+  		width: 50px;
+  		height: 50px;
+		cursor: pointer;
+		position:absolute;
+	}
+
+	.sidebar {
+  		width: 28%;
+  		display: flex;
+  		flex-direction: column;
+    	align-items: center;
+	}
+
+	.map {
+  		border-left: 1px solid #fff;
+  		position: absolute;
+  		left: 28%;
+  		width: 72%;
+  		top: 0;
+  		bottom: 0;
+	}
+
+	.pad2 {
+  		padding: 20px;
+  		-webkit-box-sizing: border-box;
+  		-moz-box-sizing: border-box;
+  		box-sizing: border-box;
+	}
+
+	/* Style the tab */
+	.tab {
+  		overflow: hidden;
+  		border: 1px solid #ccc;
+  		background-color: #f1f1f1;
+	}	
+
+	/* Style the buttons that are used to open the tab content */
+	.tab button {
+  		background-color: inherit;
+  		float: left;
+  		border: none;
+  		outline: none;
+  		cursor: pointer;
+  		padding: 14px 16px;
+  		transition: 0.3s;
+	}
+
+	/* Change background color of buttons on hover */
+	.tab button:hover {
+		background-color: #ddd;
+	}
+
+	/* Create an active/current tablink class */
+	.tab button.active {
+  		background-color: #ccc;
+	}
+
+	/* Style the tab content */
+	.tabcontent {
+		margin: 10px;
+  		display: none;
+  		padding: 2px 6px;
+  		border: 1px solid #ccc;
+	}
+</style>
+</head>
+
+<body>
+
+
+	<div class='sidebar pad2'>
+		<div class="tab">
+  			<button class="tablinks" onclick="openTab(event, 'closedTourTab')" id="closedTourButton">Closed tour</button>
+  			<button class="tablinks" onclick="openTab(event, 'p2pTourTab')" id="p2pTourButton">P2P tour</button>
+		</div>
+
+		<div id="closedTourTab" class="tabcontent">
+  			<table>
+				<tr>
+					<th>Closed tour:</th>
+				</tr>
+				<tr>
+					<td>Start:</td>
+					<td><input type="number" id="closedStart"></td>
+				</tr>
+				<tr>
+					<td>Min. length:</td>
+					<td><input type="number" min=0 id="closedMin"></td>
+				</tr>
+				<tr>
+					<td>Max. length:</td>
+					<td><input type="number" min=0 id="closedMax"></td>
+				</tr>
+				<tr>
+					<td>Strictness:</td>
+					<td><input type=range min=0 max=1 step=0.001 id="closedStrict" value="0.9"/></td>
+				</tr>
+				<tr>
+					<td>Factor:</td>
+					<td><input type="number" min=0 step="0.1" id="closedFactor" value=550></td>
+				</tr>
+				<tr>
+					<td>Num of tracks:</td>
+					<td><input type="number" min=0 step="1" id="closedCount" value=8></td>
+				</tr>
+				<tr>
+					<td><button id="closedSubmitBtn" onclick="submitClick()">OK</button></td>
+				</tr>
+			</table>
+		</div>
+
+
+		<div id="p2pTourTab" class="tabcontent">
+  			<table>
+				<tr>
+					<th>Point2Point tour:</th>
+				</tr>
+				<tr>
+					<td>Start:</td>
+					<td><input type="number" id="p2pStart"></td>
+				</tr>
+				<tr>
+					<td>Goal:</td>
+					<td><input type="number" id="p2pGoal"></td>
+				</tr>
+				<tr>
+					<td>Min. length:</td>
+					<td><input type="number" min=0 id="p2pMin"></td>
+				</tr>
+				<tr>
+					<td>Max. length:</td>
+					<td><input type="number" min=0 id="p2pMax"></td>
+				</tr>
+				<tr>
+					<td>Strictness:</td>
+					<td><input type=range min=0 max=1 step=0.001 id="p2pStrict" value="0.9"/></td>
+				</tr>
+				<tr>
+					<td>Factor:</td>
+					<td><input type="number" min=0 step="0.1" id="p2pFactor" value=550></td>
+				</tr>
+				<tr>
+					<td>Num of tracks:</td>
+					<td><input type="number" min=0 step="1" id="p2pCount" value=8></td>
+				</tr>
+				<tr>
+					<td><button id="p2pSubmitBtn" onclick="submitClick()">OK</button></td>
+				</tr>
+			</table>
+		</div>
+		
+		
+	</div>
+
+	<div id='map' class='map pad2'>
+		Map<br/>
+		<select id="routes" name="route_select" size="1">
+		</select>
+	</div>
+<script>
+	var which;
+	var fromId;
+	var toId;
+	var fromLat;
+	var fromLon;
+	var toLon;
+	var toLat;
+
+	var markerFrom;
+  	var markerTo;
+
+  	document.getElementById("closedTourButton").click();
+
+	function openTab(evt, tourName) {
+  		// Declare all variables
+  		var i, tabcontent, tablinks;
+  		fromLon = null;
+  		fromLat = null;
+  		toLon = null;
+  		toLat = null;
+  		document.getElementById("p2pGoal").value = "";
+		document.getElementById("p2pStart").value = "";
+		document.getElementById("closedStart").value = "";
+
+  		// Get all elements with class="tabcontent" and hide them
+  		tabcontent = document.getElementsByClassName("tabcontent");
+  		for (i = 0; i < tabcontent.length; i++) {
+    		tabcontent[i].style.display = "none";
+  		}
+
+  		// Get all elements with class="tablinks" and remove the class "active"
+  		tablinks = document.getElementsByClassName("tablinks");
+  		for (i = 0; i < tablinks.length; i++) {
+   	 		tablinks[i].className = tablinks[i].className.replace(" active", "");
+  		}
+
+  		// Show the current tab, and add an "active" class to the button that opened the tab
+  		document.getElementById(tourName).style.display = "block";
+  		evt.currentTarget.className += " active";
+
+  		if(tourName == 'closedTourTab'){
+  			which = 1;
+  		} else {
+  			which = 0;
+  		}
+
+  		if(markerFrom != null){
+  			markerFrom.remove();
+  		}
+
+  		if(markerTo != null){
+  			markerTo.remove();
+  		}
+
+	}
+
+	mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhZGUyNTQiLCJhIjoiY2p0Ym44b3diMG1hczQzcDhlMWhiM203OCJ9.5aB7eFT6mMTBGqt_7QSr-A';
+
+	var map = new mapboxgl.Map({
+		container: "map",
+		style: "mapbox://styles/mapbox/outdoors-v9",
+		center: [14.45, 50.08],
+		zoom: 10
+	});
+
+	var request = new XMLHttpRequest()
+
+	request.onload = function () {
+		console.log(request.status)
+		if(request.status == 200){
+			var data = JSON.parse(this.response)
+			console.log(data);
+
+			var select = document.getElementById("routes");
+
+    		for(var i = select.options.length - 1 ; i >= 0 ; i--){
+        		select.remove(i);
+    		}
+
+    		for(var i = data.length; i>0 ; --i) {
+        		var option = document.createElement('option');
+        		option.text = option.value = i;
+        		select.add(option, 0);
+    		}
+
+			map.getSource('closedwalk').setData(data[0])
+			select.value = 1
+			select.onchange=function(e){
+				map.getSource('closedwalk').setData(data[parseInt(e.target.value)-1])
+			}
+		} else {
+			console.log(this.response)
+			alert("Not found, try again")
+		}
+	}
+
+ 
+	map.on("load", function() {
+		map.addSource("closedwalk", {"type":"geojson", "data":{
+  			"type": "FeatureCollection",
+  			"features": []
+		}});
+	
+		map.addLayer({
+			"id": "tours",
+			"type": "line",
+			"source": "closedwalk",
+			"layout": {
+				"line-join": "round",
+				"line-cap": "round"
+			},
+			"paint": {
+				"line-color": "#FF0000",
+				"line-width": 7
+			},
+			"filter": ["==", "$type", "LineString"],
+		});
+
+		map.addLayer({
+			"id": "turningPoint",
+			"type": "circle",
+			"source": "closedwalk",
+			"paint": {
+				"circle-radius": 6,
+				"circle-color": "#0000FF"
+			},
+			"filter": ["==", "$type", "Point"],
+		});
+
+		map.addSource("boundingBox", {"type":"geojson", "data": {
+  			"type": "FeatureCollection",
+  			"features": []
+		}});
+	
+		map.addLayer({
+			"id": "borders",
+			"type": "line",
+			"source": "boundingBox",
+			"layout": {
+				"line-join": "round",
+				"line-cap": "round"
+			},
+			"paint": {
+				"line-color": "#000000",
+				"line-width": 1
+			},
+			"filter": ["==", "$type", "Polygon"],
+		});
+
+		var borderRequest = new XMLHttpRequest();
+		borderRequest.onload = function(){
+			if(borderRequest.status == 200){
+				var data = JSON.parse(this.response)
+				map.getSource('boundingBox').setData(data)
+			} else {
+				console.log(this.response)
+			}
+		}
+
+		borderRequest.open('GET', 'http://localhost:8888/border', true)
+		borderRequest.send()
+	});
+
+
+	map.on('click', function (e){
+		var mapRequest = new XMLHttpRequest();
+		mapRequest.onload = function(){
+			if(mapRequest.status == 200){
+
+				var data = JSON.parse(this.response)
+				if(which == 1){
+					fromLon = data.longitude;
+					fromLat = data.latitude;
+					document.getElementById("closedStart").value = parseInt(data.id);
+				} else {
+					if(fromLon == null && fromLat == null){
+						fromLon = data.longitude;
+						fromLat = data.latitude;
+						document.getElementById("p2pStart").value = parseInt(data.id);
+					} else if(toLon == null && toLat == null){
+						toLon = data.longitude;
+						toLat = data.latitude;
+						document.getElementById("p2pGoal").value = parseInt(data.id);
+					} else {
+						fromLon = data.longitude;
+						fromLat = data.latitude;
+						toLon = null
+						toLat = null
+						document.getElementById("p2pGoal").value = "";
+						document.getElementById("p2pStart").value = parseInt(data.id);
+					}
+				}
+
+				if(markerFrom != null){
+  					markerFrom.remove();
+  				}
+
+  				if(markerTo != null){
+  					markerTo.remove();
+  				}
+
+				console.log(fromLat + ', ' + fromLon);
+
+				if(fromLat !== null && fromLon !== null){
+					var el = document.createElement('div');
+  					el.className = 'marker';
+					markerFrom = new mapboxgl.Marker(el)
+  					.setLngLat([fromLon, fromLat])
+  					.addTo(map);
+    			}
+
+    			if(toLat !== null && toLon !== null){
+					var el = document.createElement('div');
+  					el.className = 'marker';
+					markerTo = new mapboxgl.Marker(el)
+  					.setLngLat([toLon, toLat])
+  					.addTo(map);
+    			}
+
+			}
+
+
+		}
+		console.log(e.lngLat.lat + ', ' + e.lngLat.lng);
+		var url = 'http://localhost:8888/map?lat=' + e.lngLat.lat + '&lon=' + e.lngLat.lng;
+		mapRequest.open('GET', url, true)
+		mapRequest.send()
+		console.log(url)
+	});
+</script>
+
+<script type="text/javascript">
+		function submitClick(){
+			var minL, maxL, start, goal, factor, strict, tours;
+			if(which == 1){
+				minL = parseInt(document.getElementById("closedMin").value)
+				maxL = parseInt(document.getElementById("closedMax").value)
+				start = parseInt(document.getElementById("closedStart").value)
+				factor = parseFloat(document.getElementById("closedFactor").value)
+				strict = document.getElementById("closedStrict").value
+				tours = parseInt(document.getElementById("closedCount").value)
+			} else {
+				minL = parseInt(document.getElementById("p2pMin").value)
+				maxL = parseInt(document.getElementById("p2pMax").value)
+				start = parseInt(document.getElementById("p2pStart").value)
+				goal = parseInt(document.getElementById("p2pGoal").value)
+				factor = parseFloat(document.getElementById("p2pFactor").value)
+				strict = document.getElementById("p2pStrict").value
+				tours = parseInt(document.getElementById("p2pCount").value)
+			}
+
+			var url;
+
+
+			if(which == 1){
+				url = 'http://localhost:8888/closed?start='+start+'&minLength='+minL+'&maxLength='+maxL;
+			} else {
+				url = 'http://localhost:8888/p2p?start='+start+'&goal='+goal+'&minLength='+minL+'&maxLength='+maxL;
+			}
+			
+			if(!isNaN(factor)){
+				url = url + '&factor=' + factor
+			}
+
+			if(!isNaN(strict)){
+				url = url + '&strict=' + strict
+			}
+
+			if(!isNaN(tours)){
+				url = url + '&tours=' + tours
+			}
+
+			console.log(url)
+			request.open('GET', url, true)
+			request.send()
+	}
+</script>
+ 
+</body>
+</html>

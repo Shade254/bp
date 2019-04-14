@@ -1,44 +1,43 @@
 package cz.matocmir.tours.backpath;
 
 import com.umotional.planningalgorithms.core.Path;
+import cz.matocmir.tours.model.TourEdge;
 import cz.matocmir.tours.model.TreeNode;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class BackPath implements Path<Integer> {
+public class BackPath implements Path<BackPathLabel> {
 
-	List<Integer> path;
-	List<TreeNode> fullPath;
-	int[] costVector;
-	Integer lastId;
-	double totalLength;
+	private BackPathLabel last;
+	private double totalLength;
 
-	public BackPath(BackPathLabel label) {
-		fullPath = label.getCandidate().correspNode.pathFromRoot();
-		path = fullPath.stream().map(t -> t.getNode().getId()).collect(Collectors.toList());
-		costVector = label.getCostVector();
-		lastId = label.getObjectId();
-		totalLength = label.getCandidate().length;
+	public BackPath(BackPathLabel last) {
+		this.last = last;
+		totalLength = last.getCandidate().correspNode.pathFromRoot().stream().map(TreeNode::getEdgeFromParent)
+				.filter(Objects::nonNull).mapToDouble(TourEdge::getLengthInMeters).sum();
 	}
 
 	@Override
 	public int[] getCostVector() {
-		return costVector;
+		return last.getCostVector();
 	}
 
 	@Override
-	public Integer getLastLabelObjId() {
-		return lastId;
+	public BackPathLabel getLastLabelObjId() {
+		return last;
 	}
 
 	@Override
 	public List<Integer> getPath() {
-		return path;
+		return last.getCandidate().correspNode.pathFromRoot().stream().map(n -> n.getNode().getId())
+				.collect(Collectors.toList());
 	}
 
-	public List<TreeNode> getFullPath(){
-		return fullPath;
+	public List<TourEdge> getExactPath() {
+		return last.getCandidate().correspNode.pathFromRoot().stream().map(TreeNode::getEdgeFromParent)
+				.filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
 	public double getTotalLength() {

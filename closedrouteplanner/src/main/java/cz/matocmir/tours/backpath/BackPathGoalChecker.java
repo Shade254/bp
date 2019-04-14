@@ -2,9 +2,6 @@ package cz.matocmir.tours.backpath;
 
 import com.umotional.planningalgorithms.core.GoalChecker;
 import cz.matocmir.tours.model.TourNode;
-import cz.matocmir.tours.model.TreeNode;
-
-import java.util.List;
 
 public class BackPathGoalChecker implements GoalChecker<BackPathLabel> {
 	private boolean searchFinished = false;
@@ -16,7 +13,8 @@ public class BackPathGoalChecker implements GoalChecker<BackPathLabel> {
 
 	@Override
 	public boolean visitGoal(BackPathLabel current) {
-		return current.getCandidate().correspNode.getNode().getId() == startingPoint.getId();
+		searchFinished = (current.getCandidate().correspNode.getNode().getId() == startingPoint.getId());
+		return searchFinished;
 	}
 
 	@Override

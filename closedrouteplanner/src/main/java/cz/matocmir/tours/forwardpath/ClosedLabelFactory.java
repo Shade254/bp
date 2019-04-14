@@ -8,16 +8,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class ForwardPathLabelFactory implements LabelFactory<ForwardPathLabel> {
+public class ClosedLabelFactory implements LabelFactory<ForwardPathLabel> {
 	private static final double epsilon = 0.001;
 	private TourGraph graph;
-	private int maxLength;
+	private double maxLength;
 	private TourNode startNode;
 	//this could be set
 	//or not - paths are distinctive
 	private List<Candidate> boundaryNodes;
 
-	public ForwardPathLabelFactory(TourGraph graph, int maxLength, TourNode startNode) {
+	public ClosedLabelFactory(TourGraph graph, double maxLength, TourNode startNode) {
 		this.graph = graph;
 		this.maxLength = maxLength;
 		this.startNode = startNode;
@@ -30,7 +30,7 @@ public class ForwardPathLabelFactory implements LabelFactory<ForwardPathLabel> {
 		List<ForwardPathLabel> res = new ArrayList<>();
 
 		List<TourEdge> outEdges = graph.getOutEdges(curCan.correspNode.getNode().getId());
-		for(TourEdge e : outEdges){
+		for (TourEdge e : outEdges) {
 			Candidate cn = new Candidate(new TreeNode(e, curCan.correspNode, e.getTo()), curCan.weight + e.getCost(),
 					curCan.length + e.getLengthInMeters());
 			List<TourEdge> cnOutEdges = graph.getOutEdges(cn.correspNode.getNode().getId());
@@ -48,13 +48,12 @@ public class ForwardPathLabelFactory implements LabelFactory<ForwardPathLabel> {
 				}
 			}
 
-			double tourL = cn.length + TourUtils
-					.computeGreatCircleDistance(cn.correspNode.getNode().getLatitude(),
-							cn.correspNode.getNode().getLongitude(), startNode.getLatitude(),
-							startNode.getLongitude());
+			double tourL = cn.length + TourUtils.computeGreatCircleDistance(cn.correspNode.getNode().getLatitude(),
+					cn.correspNode.getNode().getLongitude(), startNode.getLatitude(), startNode.getLongitude());
 			if (tourL <= maxLength + epsilon) {
-					res.add(new ForwardPathLabel(cn.correspNode.getNode().getId(), new int[]{(int)cn.weight}, label, cn));
-			} else if(cn.length>0){
+				res.add(new ForwardPathLabel(cn.correspNode.getNode().getId(), new int[] { (int) cn.weight }, label,
+						cn));
+			} else if (cn.length > 0) {
 				boundaryNodes.add(label.getCandidate());
 			}
 		}

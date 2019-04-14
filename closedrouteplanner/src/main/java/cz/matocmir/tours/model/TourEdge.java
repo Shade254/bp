@@ -1,5 +1,6 @@
 package cz.matocmir.tours.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.umotional.basestructures.GPSLocation;
 import com.umotional.basestructures.IEdge;
 import com.umotional.basestructures.INode;
@@ -7,12 +8,16 @@ import cz.matocmir.tours.utils.TourUtils;
 
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TourEdge implements IEdge {
 	private TourNode from;
 	private TourNode to;
 	private double cost;
 	private double length;
 	private GPSLocation middle;
+
+	public TourEdge() {
+	}
 
 	public TourEdge(TourNode from, TourNode to, double cost, double length) {
 		this.from = from;
