@@ -23,7 +23,7 @@
   		width: 50px;
   		height: 50px;
 		cursor: pointer;
-		position:absolute;
+		position: absolute;
 	}
 
 	.sidebar {
@@ -170,7 +170,15 @@
 				</tr>
 			</table>
 		</div>
-		
+
+		<div>
+			<input type="checkbox" id="method_select">
+		</div>
+
+		<div>
+			<select id="routes" name="route_select" size="1">
+			</select>
+		</div>
 
 		<h3>Tour stats:</h3>
 		<div align="left">
@@ -182,11 +190,7 @@
 
 	</div>
 
-	<div id='map' class='map pad2'>
-		Map<br/>
-		<select id="routes" name="route_select" size="1">
-		</select>
-	</div>
+	<div id='map'class='map'></div>
 <script>
 	var port = 8080;
 
@@ -397,6 +401,7 @@
 
 	// when user clicks in the map, map its location to the nearest node(on server), put marker there and set it as origin or destination
 	map.on('click', function (e){
+
 		var mapRequest = new XMLHttpRequest();
 		mapRequest.onload = function(){
 			if(mapRequest.status == 200){
@@ -463,7 +468,7 @@
 <script type="text/javascript">
 		// collect info from input fields and send it to the server
 		function submitClick(){
-			var minL, maxL, start, goal, factor, strict, tours;
+			var minL, maxL, start, goal, factor, strict, tours, method;
 			if(which == 1){
 				minL = parseInt(document.getElementById("closedMin").value)
 				maxL = parseInt(document.getElementById("closedMax").value)
@@ -480,6 +485,8 @@
 				strict = document.getElementById("p2pStrict").value
 				tours = parseInt(document.getElementById("p2pCount").value)
 			}
+
+			method = document.getElementById("method_select").checked
 
 			var url;
 
@@ -501,6 +508,9 @@
 			if(!isNaN(tours)){
 				url = url + '&tours=' + tours
 			}
+
+			url = url + '&method=' + method
+
 
 			console.log(url)
 			request.open('GET', url, true)

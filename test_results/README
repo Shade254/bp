@@ -1,6 +1,0 @@
-Použitý graf je v souboru graph.geojson
-Každá složka představuje jednu instanci problému.
-Přesné zadání parametrů je v souboru input.
-Vrcholy nalezené v prvním hledání jsou v souboru found.geojson.
-Všechny zkoušené cesty k nalezeným vrcholům jsou v souborech forw_path_X.geojson.
-Pokud byla k dané cestě nalezena i zpáteční cesta, která vyhovuje zadaným kritériím je konečný výsledek uložen v cycle_X.geojson

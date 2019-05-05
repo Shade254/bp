@@ -137,13 +137,18 @@ public class TourUtils {
 
 	public static double tourPenalty(List<TourEdge> walk, double totalLength) {
 		double penalty = 0;
+		double distance;
 
 		for (int i = 0; i < walk.size(); i++) {
 			TourEdge curEdge = walk.get(i);
+			distance = (curEdge.getLengthInMeters()/2);
 			for (int j = i; j < walk.size(); j++) {
 				TourEdge secondEdge = walk.get(j);
-				penalty += 2 * (curEdge.roundnessPenalty(secondEdge, totalLength, 1) * curEdge.getLengthInMeters()
+				distance += (secondEdge.getLengthInMeters()/2);
+				penalty += 2 * (curEdge.roundnessPenalty(secondEdge, distance, 1) * curEdge.getLengthInMeters()
 						* secondEdge.getLengthInMeters());
+				distance += (secondEdge.getLengthInMeters()/2);
+
 			}
 		}
 		penalty /= (Math.pow(totalLength, 2));

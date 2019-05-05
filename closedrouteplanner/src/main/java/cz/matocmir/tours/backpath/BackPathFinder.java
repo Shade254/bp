@@ -5,7 +5,6 @@ import com.umotional.planningalgorithms.core.LabelFactory;
 import com.umotional.planningalgorithms.core.ShortestPathAlgorithm;
 import cz.matocmir.tours.model.*;
 import cz.matocmir.tours.utils.TourUtils;
-import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -22,6 +21,27 @@ public class BackPathFinder {
 
 	public BackPathFinder(TourGraph graph) {
 		this.graph = graph;
+	}
+
+	public Tour getPathFromTurningPoint(TourRequest request, Candidate cand) {
+		List<TourEdge> forwardPath = cand.correspNode.pathFromRoot().stream().map(TreeNode::getEdgeFromParent)
+				.filter(Objects::nonNull).collect(Collectors.toList());
+		BackPath bp = getPathsWithRoundness(request, cand.correspNode.getNode(), cand.length, forwardPath);
+		if (bp == null)
+			return null;
+
+		double length = bp.getTotalLength() + cand.length;
+
+		if (length < request.getMinLength() || length > request.getMaxLength()) {
+			return null;
+		}
+
+		List<TourEdge> completePath = new ArrayList<>(forwardPath);
+		completePath.addAll(bp.getExactPath());
+		double totalCost = forwardPath.stream().mapToDouble(TourEdge::getCost).sum() + bp.getLastLabelObjId()
+				.getCandidate().weight;
+
+		return new Tour(completePath, cand.correspNode.getNode(), cand.correspNode.getNode(), totalCost);
 	}
 
 	public Tour getCompletedPath(Candidate candidate, TourRequest request) {
@@ -68,14 +88,14 @@ public class BackPathFinder {
 			}
 		}
 
-		if(bestPath != null){
+		if (bestPath != null) {
 			response = new Tour(bestPath, candidate.correspNode.getNode(), bestUsed, bestScore);
 		}
 
 		return response;
 	}
 
-	private BackPath getPathsWithRoundness(TourRequest request, TourNode start, double forwardLength,
+	public BackPath getPathsWithRoundness(TourRequest request, TourNode start, double forwardLength,
 			List<TourEdge> forwardPath) {
 		TourNode st = graph.getNode(request.getStartNode());
 		TourNode go = graph.getNode(request.getGoalNode());
@@ -140,6 +160,11 @@ public class BackPathFinder {
 
 			if (pathBack != null) {
 				Candidate last = pathBack.getLastLabelObjId().getCandidate();
+
+				if(last.length + forwardLength < request.getMinLength() || last.length + forwardLength > request.getMaxLength()){
+					continue;
+				}
+
 				if (last.weight + forwardCost < bestScore) {
 					bestTurningPoint = turnP;
 					bestScore = last.weight + forwardCost;
@@ -153,7 +178,7 @@ public class BackPathFinder {
 
 			}
 		}
-		if(bestPath != null){
+		if (bestPath != null) {
 			response = new Tour(bestPath, lastTurningPoint.correspNode.getNode(), bestTurningPoint, bestScore);
 		}
 

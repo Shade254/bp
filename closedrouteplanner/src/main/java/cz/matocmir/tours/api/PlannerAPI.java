@@ -1,9 +1,11 @@
 package cz.matocmir.tours.api;
 
 import com.umotional.basestructures.BoundingBox;
-import cz.matocmir.tours.model.*;
+import cz.matocmir.tours.model.TourEdge;
+import cz.matocmir.tours.model.TourNode;
+import cz.matocmir.tours.model.TourRequest;
+import cz.matocmir.tours.model.TourResponse;
 import cz.matocmir.tours.utils.IOUtils;
-import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
@@ -15,7 +17,7 @@ import java.util.Random;
 @Path("/")
 public class PlannerAPI {
 	private static final Logger log = Logger.getLogger(PlannerAPI.class);
-	static PlannerService service = new PlannerService();
+	private static PlannerService service = new PlannerService();
 
 	@GET
 	@Path("/closed")
@@ -23,13 +25,17 @@ public class PlannerAPI {
 	public Response getClosedTour(@QueryParam("start") Integer startId, @QueryParam("minLength") Integer minLength,
 			@QueryParam("maxLength") Integer maxLength, @DefaultValue("-1") @QueryParam("tours") Integer toursNumber,
 			@DefaultValue("-1") @QueryParam("strict") Double strictness,
-			@DefaultValue("-1") @QueryParam("factor") Double factor) {
+			@DefaultValue("-1") @QueryParam("factor") Double factor, @DefaultValue("1") @QueryParam("method") Boolean method) {
 
 		TourRequest request = new TourRequest(startId, -1, factor, strictness, minLength, maxLength);
 		TourResponse result = null;
 
 		try {
-			result = service.getClosedTours(request, toursNumber);
+			if(method) {
+				result = service.getClosedTours2(request, toursNumber);
+			} else {
+				result = service.getClosedTours(request, toursNumber);
+			}
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 			return Response.status(400).build();
@@ -49,12 +55,17 @@ public class PlannerAPI {
 			@QueryParam("minLength") Integer minLength, @QueryParam("maxLength") Integer maxLength,
 			@DefaultValue("-1") @QueryParam("tours") Integer toursNumber,
 			@DefaultValue("-1") @QueryParam("strict") Double strictness,
-			@DefaultValue("-1") @QueryParam("factor") Double factor) {
+			@DefaultValue("-1") @QueryParam("factor") Double factor, @DefaultValue("1") @QueryParam("method") Boolean method) {
 
 		TourRequest request = new TourRequest(startId, goalId, factor, strictness, minLength, maxLength);
 		TourResponse result = null;
 		try {
-			result = service.getP2PTours(request, toursNumber);
+			if(method) {
+				result = service.getP2PTours2(request, toursNumber);
+			} else {
+				result = service.getP2PTours(request, toursNumber);
+			}
+
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 			return Response.status(400).build();

@@ -1,7 +1,6 @@
 package cz.matocmir.tours.forwardpath;
 
 import com.umotional.planningalgorithms.core.Dijkstra;
-import com.umotional.planningalgorithms.core.LabelFactory;
 import com.umotional.planningalgorithms.core.ShortestPathAlgorithm;
 import cz.matocmir.tours.model.*;
 import org.apache.log4j.Logger;
@@ -21,27 +20,21 @@ public class CandidateFinder {
 	public List<Candidate> forwardSearch(TourRequest request) throws IllegalArgumentException {
 		TourNode start = graph.getNode(request.getStartNode());
 		TourNode goal = graph.getNode(request.getGoalNode());
-		boolean p2p = false;
+
 		if (start == null) {
 			throw new IllegalArgumentException("Start or goal node not in graph");
 		}
 
-		if (goal != null) {
-			p2p = true;
-		} else {
+		if (goal == null) {
 			goal = start;
 		}
 
 		Candidate startCan = new Candidate(new TreeNode(null, null, start), 0, 0);
 		ForwardPathGoalChecker gc = new ForwardPathGoalChecker(request.getMinLength(), goal);
 		ForwardPathLabel startLabel = new ForwardPathLabel(start.getId(), new int[] { 0 }, null, startCan);
-		LabelFactory<ForwardPathLabel> labelFactory;
+		Point2PointLabelFactory labelFactory;
 
-		if (p2p) {
-			labelFactory = new Point2PointLabelFactory(graph, goal.getId(), request.getMaxLength());
-		} else {
-			labelFactory = new ClosedLabelFactory(graph, request.getMaxLength(), goal);
-		}
+		labelFactory = new Point2PointLabelFactory(graph, start.getId(), request.getMaxLength());
 
 		ShortestPathAlgorithm<ForwardPathLabel, ForwardPath> alg = new Dijkstra(labelFactory, startLabel, gc,
 				new ForwardPathFactory());
@@ -49,11 +42,7 @@ public class CandidateFinder {
 		List<Candidate> unfiltered = results.stream().sorted(Comparator.comparingInt(p -> p.getCostVector()[0]))
 				.map(r -> r.getLastLabelObjId().getCandidate()).collect(Collectors.toList());
 
-		if (p2p) {
-			unfiltered.addAll(((Point2PointLabelFactory) labelFactory).getBoundaryNodes());
-		} else {
-			unfiltered.addAll(((ClosedLabelFactory) labelFactory).getBoundaryNodes());
-		}
+		unfiltered.addAll(labelFactory.getBoundaryNodes());
 
 		return unfiltered;
 	}
