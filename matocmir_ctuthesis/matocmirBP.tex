@@ -123,7 +123,13 @@ We can also restrict the amount of turning points obtained from each candidate. 
 
 
 \chapter{Implementation}
+\begin{figure}[H]
+	\includegraphics[width=0.9\textwidth]{communication}
+	\caption{Simple schema of implementation part of this project.}
+\end{figure}
+
 To demonstrate algorithms described above I implemented them as a Java application using Open Source libraries. It is furthermore wrapped as a webservice exposing REST API. Every application can submit parameterized requests for route planning. Best routes are then returned as a response. On top of that I build simple web client in Javascript which can consume the web service and make the process easier for a person. It also provides visualizations and debugging data. All these programs and their architectures are described more thoroughly in the next sections.
+
 
 \section{Implementation description}
 \section{Communication}

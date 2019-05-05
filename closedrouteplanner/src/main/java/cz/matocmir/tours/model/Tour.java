@@ -79,4 +79,8 @@ public class Tour {
 	public void setTotalCost(double totalCost) {
 		this.totalCost = totalCost;
 	}
+
+	public double getFinalMeanCost(double factor){
+		return (getTotalCost()/getLength()) + (getRoundness()*factor);
+	}
 }

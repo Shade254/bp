@@ -70,7 +70,7 @@ public class PlannerService {
 
 		log.info("Found " + cands.size() + " candidates");
 
-		for(CandidateFilter filter : filters){
+		for (CandidateFilter filter : filters) {
 			cands = filter.filter(cands);
 		}
 
@@ -107,10 +107,11 @@ public class PlannerService {
 			}
 		}
 
-		paths.sort(Comparator
-				.comparingDouble(t -> (t.getTotalCost() / t.getLength()) + (request.getFactor() * t.getRoundness())));
+		paths.sort(Comparator.comparingDouble(t -> t.getFinalMeanCost(request.getFactor())));
 
-		paths.forEach(e -> System.out.println((e.getTotalCost() / e.getLength()) + (request.getFactor() * e.getRoundness()) + " { " + (e.getTotalCost() / e.getLength()) + ", " +(request.getFactor() * e.getRoundness())+ " }"));
+		paths.forEach(e -> System.out.println(
+				e.getFinalMeanCost(request.getFactor()) + " { " + (e.getTotalCost() / e.getLength()) + ", " + (
+						request.getFactor() * e.getRoundness()) + " }"));
 
 		response.setResponseTime(System.currentTimeMillis() - stopwatch);
 		response.setTours(paths.toArray(new Tour[0]));
@@ -161,11 +162,11 @@ public class PlannerService {
 			}
 		}
 
-		paths.sort(Comparator
-				.comparingDouble(t -> (t.getTotalCost() / t.getLength()) + (request.getFactor() * t.getRoundness())));
+		paths.sort(Comparator.comparingDouble(t -> t.getFinalMeanCost(request.getFactor())));
 
-		paths.forEach(e -> System.out.println((e.getTotalCost() / e.getLength()) + (request.getFactor() * e.getRoundness()) + " { " + (e.getTotalCost() / e.getLength()) + ", " +(request.getFactor() * e.getRoundness())+ " }"));
-
+		paths.forEach(e -> System.out.println(
+				e.getFinalMeanCost(request.getFactor()) + " { " + (e.getTotalCost() / e.getLength()) + ", " + (
+						request.getFactor() * e.getRoundness()) + " }"));
 
 		response.setResponseTime(System.currentTimeMillis() - stopwatch);
 		response.setTours(paths.toArray(new Tour[0]));
@@ -222,17 +223,17 @@ public class PlannerService {
 
 		}
 
-		result.sort(Comparator
-				.comparingDouble(t -> (t.getTotalCost() / t.getLength()) + (request.getFactor() * t.getRoundness())));
+		result.sort(Comparator.comparingDouble(t -> t.getFinalMeanCost(request.getFactor())));
 
-		result.forEach(e -> System.out.println((e.getTotalCost() / e.getLength()) + (request.getFactor() * e.getRoundness()) + " { " + (e.getTotalCost() / e.getLength()) + ", " +(request.getFactor() * e.getRoundness())+ " }"));
+		result.forEach(e -> System.out.println(
+				e.getFinalMeanCost(request.getFactor()) + " { " + (e.getTotalCost() / e.getLength()) + ", " + (
+						request.getFactor() * e.getRoundness()) + " }"));
 
 		response.setResponseTime(System.currentTimeMillis() - stopwatch);
 		response.setTours(result.toArray(new Tour[0]));
 
 		return response;
 	}
-
 
 	public TourResponse getP2PTours2(TourRequest request, int toursNumber) throws IllegalArgumentException {
 		log.info("Starting P2P-2 for request " + request.toString());
@@ -252,7 +253,7 @@ public class PlannerService {
 		List<Candidate> turningPoints = candFinder.forwardSearch(request);
 		System.out.println("Found " + turningPoints.size() + " candidates");
 
-		for(CandidateFilter filter : filters){
+		for (CandidateFilter filter : filters) {
 			turningPoints = filter.filter(turningPoints);
 		}
 
@@ -275,25 +276,26 @@ public class PlannerService {
 				continue;
 			}
 
-			List<TourEdge> forwardPath = turningPoint.correspNode.pathFromRoot().stream().map(TreeNode::getEdgeFromParent).filter(
-					Objects::nonNull).collect(Collectors.toList());
+			List<TourEdge> forwardPath = turningPoint.correspNode.pathFromRoot().stream()
+					.map(TreeNode::getEdgeFromParent).filter(Objects::nonNull).collect(Collectors.toList());
 
 			Tour tour;
-			BackPath bp = backPathFinder.getPathsWithRoundness(request, turningPoint.correspNode.getNode(), turningPoint.length, forwardPath);
+			BackPath bp = backPathFinder
+					.getPathsWithRoundness(request, turningPoint.correspNode.getNode(), turningPoint.length,
+							forwardPath);
 
-			if(bp == null)
+			if (bp == null)
 				continue;
 
 			double totalLength = turningPoint.length + bp.getTotalLength();
-			if(totalLength < request.getMinLength() || totalLength > request.getMaxLength()){
+			if (totalLength < request.getMinLength() || totalLength > request.getMaxLength()) {
 				continue;
 			}
 
-
 			forwardPath.addAll(bp.getExactPath());
 			double totalCost = forwardPath.stream().mapToDouble(TourEdge::getCost).sum() + turningPoint.weight;
-			tour = new Tour(forwardPath, turningPoint.correspNode.getNode(), turningPoint.correspNode.getNode(), totalCost);
-
+			tour = new Tour(forwardPath, turningPoint.correspNode.getNode(), turningPoint.correspNode.getNode(),
+					totalCost);
 
 			if (tour.getOriginalEdges() != null && !tour.getOriginalEdges().isEmpty()) {
 				System.out.println(foundWalks + ". path to goal found");
@@ -308,11 +310,11 @@ public class PlannerService {
 
 		}
 
-		result.sort(Comparator
-				.comparingDouble(t -> (t.getTotalCost() / t.getLength()) + (request.getFactor() * t.getRoundness())));
+		result.sort(Comparator.comparingDouble(t -> t.getFinalMeanCost(request.getFactor())));
 
-		result.forEach(e -> System.out.println((e.getTotalCost() / e.getLength()) + (request.getFactor() * e.getRoundness()) + " { " + (e.getTotalCost() / e.getLength()) + ", " +(request.getFactor() * e.getRoundness())+ " }"));
-
+		result.forEach(e -> System.out.println(
+				e.getFinalMeanCost(request.getFactor()) + " { " + (e.getTotalCost() / e.getLength()) + ", " + (
+						request.getFactor() * e.getRoundness()) + " }"));
 
 		response.setResponseTime(System.currentTimeMillis() - stopwatch);
 		response.setTours(result.toArray(new Tour[0]));

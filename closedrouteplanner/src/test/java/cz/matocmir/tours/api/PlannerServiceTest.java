@@ -65,4 +65,55 @@ public class PlannerServiceTest {
 		}
 
 	}
+
+
+	@Test
+	public void performanceByTourCount() {
+
+		TourRequest request = new TourRequest(1392, -1, 400, 0.9, 4000, 6000);
+
+
+		int minTries = 1;
+		int maxTries = 30;
+
+		List<Double> scores1 = new ArrayList<>();
+		List<Double> scores2 = new ArrayList<>();
+		List<Long> time1 = new ArrayList<>();
+		List<Long> time2 = new ArrayList<>();
+
+
+		for(int i = minTries;i<maxTries;i++){
+			System.out.println("Testing: " + request.toString());
+			TourResponse response1 = service.getClosedTours(request, i);
+			TourResponse response2 = service.getClosedTours2(request, i);
+			System.out.println(
+					"Method 1 time: " + response1.getResponseTime() + " ms" + " tours: " + response1.getTours().length);
+			System.out.println(
+					"Method 2 time: " + response2.getResponseTime() + " ms" + " tours: " + response2.getTours().length);
+			Tour best1 = Arrays.stream(response1.getTours()).min(Comparator.comparingDouble(e -> e.getFinalMeanCost(request.getFactor()))).get();
+			Tour best2 = Arrays.stream(response2.getTours()).min(Comparator.comparingDouble(e -> e.getFinalMeanCost(request.getFactor()))).get();
+			System.out.println(
+					"Method 1 best score: " + best1.getFinalMeanCost(request.getFactor()) + " with roundness " + best1.getRoundness());
+			System.out.println(
+					"Method 2 best score: " + best2.getFinalMeanCost(request.getFactor()) + " with roundness " + best2.getRoundness());
+			scores1.add(best1.getFinalMeanCost(request.getFactor()));
+			scores2.add(best2.getFinalMeanCost(request.getFactor()));
+			time1.add(response1.getResponseTime());
+			time2.add(response2.getResponseTime());
+			System.out.println("=============================================================================");
+		}
+
+		System.out.println("\n\n\n\nRESULTS:");
+
+		System.out.println(scores1);
+		System.out.println(scores2);
+		System.out.println("=============================================================================");
+		System.out.println(time1);
+		System.out.println(time2);
+
+
+
+
+
+	}
 }
