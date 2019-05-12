@@ -1,5 +1,14 @@
 \documentclass{ctuthesis}
 \usepackage{mathtools}
+\usepackage{subfig}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{xparse}
+
+
+\lstset{language=C,keywordstyle={\bfseries \color{blue}}}
+
+
 \ctusetup{
 	xdoctype = B,
 	xfaculty = F3,
@@ -39,6 +48,9 @@
 	In Prague, \ctufield{day}.~\monthinlanguage{title}~\ctufield{year}
 \end{declaration}
 
+\NewDocumentCommand{\codeword}{v}{
+\texttt{\textcolor{blue}{#1}}
+}
 
 \begin{document}
 \maketitle
@@ -112,27 +124,84 @@ We are going to run a graph search (most likely the Dijkstra graph search) that 
 I am going to assume we have just one candidate \(t\) linked with proper forward path from earlier. The actual act of selecting from bunch of acceptable candidates is described below. Now we have to find path back from this candidate. This path \(\rho\) starts in \(t\) ends in \(g\), and it has to be true that \(l(\rho) + l(\pi) \in L\). To obtain this back path, we launch yet another graph search from \(t\). This search is aimed toward \(g\), constrained by length and uses mean total cost \(c\), that is introduced above, to order encountered nodes in its open list. Employing total cost in this search has legitimate reason - it ensures that our backward path will respect the need to obtain round and geospatially diverse walk. It makes proportionally to \(\lambda\) and \(\sigma\) harder to revisit the same segment of the road, but it doesn't forbid it completelly, which has positive efect on solvability. And it still respects (except extreme cases) the weight of each edge. From this word specification we can obtain the actual formula to use in backward search. We start with simple mean cost for edge \(e\), \(c(e) = w(e) + \lambda p(e, \pi)\). To get the roundness penalty of selected edge against the whole forward path we will take the roundness penalty formula from previous chapter and limit it to formula \(p(e, \pi) = \frac {2 \lambda} {l_{max}} \sum_{e' \in \pi}{p(e, e') l(e) l(e')}\). This is the last thing needed to complete and launch our search, which if successful yields two paths \(\pi\) and \(\rho\). These paths combined forms our result, path containing all three points \(s, g, t\) with its length in interval \(L\) and mean cost close to optimal. But this is only smaller subproblem. To get close to global optima we have to use another technics mostly to help us select ideal turning points from candidates found in first stage of our algorithm.
 
 \section{Filtering and picking candidates}
-From now on I am working with set of candidates obtained in the first stage of the algorithm, all of them fit to serve as a turning point for described backward routing. It would be highly impractical due to overwhelming resource consumption to plan backward path from each of them. Althoug sorting and filtering this set of walks would lead to results which are closest to the optimal one. The most simple approach would be to pick from this set at random but that has obvious impact on result quality. We could easily point the picking mechanism to the candidate set that has much better probability to result in close to optimal set of solutions. One of the options is to sort the candidates by best mean cost of their forward paths. These paths have higher probability to be included in the optimal solution. Another technique is to take into account the geographic location of picked candidates. We can favor picking sets of turning points which are most geospatially diverse. This has several benefits. For one it makes higher the chance to find the optimal solution to the problem instance. The smaller the distance between two turning points the higher the probablity that the optimal paths from the starting point share most of the segments with only small diversion at the end. These close turning point tend to share very similar backward paths also. Therefor even a lot of used turning points in the same bad area won't find optimal solution. And for the second this technique is also benefical for the end user. It naturally yields geospatial diverse sets of solutions. And we know these results are the most attractive for people that use external suggestions for recreational tours as it bring more distinctive choices for the user to choose from.
+From now on I am working with set of candidates obtained in the first stage of the algorithm, all of them fit to serve as a turning point for described backward routing. It would be highly impractical due to overwhelming resource consumption to plan backward path from each of them. Althoug sorting and filtering this set of walks would lead to results which are closest to the optimal one. The most simple approach would be to pick from this set at random but that has obvious impact on result quality. We could easily point the picking mechanism to the candidate set that has much better probability to result in close to optimal set of solutions. One of the options is to sort the candidates by best mean cost of their forward paths. These paths have higher probability to be included in the optimal solution.\par
+Another technique is to take into account the geographic location of picked candidates. We can favor picking sets of turning points which are most geospatially diverse. This has several benefits. For one it makes higher the chance to find the optimal solution to the problem instance. The smaller the distance between two turning points the higher the probablity that the optimal paths from the starting point share most of the segments with only small diversion at the end. These close turning point tend to share very similar backward paths also. Therefor even a lot of used turning points in the same bad area won't find optimal solution. And for the second this technique is also benefical for the end user. It naturally yields geospatial diverse sets of solutions. And we know these results are the most attractive for people that use external suggestions for recreational tours as it bring more distinctive choices for the user to choose from.\par
+The candidate that is picked as turning point is actually one of the most important factors which have impact on quality of the result as a whole. After this realization we build the first version of algorithm like this - we find the candidate set mentioned earlier, then we filter it with multiple distinctive filters in order to restrict the set to only the most promising nodes. After this filtration we pick some number of random candidates, run the backward routing using them as turning points and sort the results by total mean cost to return the best ones. This strategy of filtering the candidates by multiple criteria beforehand the picking has shown to be pretty effective in combination with previously mentioned methods. Both methods result quality suffer from nodes spaced too densly in the candidate set. You have much greater probability to chose multiple proximate nodes and that have, as I described, negative impact on final dissimilarity in the solution set. It is also much more resource efficient method to filter these candidates before the backward routing than filtering the result set by geospatial diversity afterwards. \par
+There are several filters that has turned out to be quite handy for making the resulting tour smoother I will mention and describe some of them in next sections.
+\begin{figure}[!tbp]
+  \centering
+  \subfloat[Removing dead ends]{\includegraphics[width=0.4\textwidth]{deadEnds}\label{fig:f1}}
+  \hfill
+  \subfloat[Node contraction]{\includegraphics[width=0.4\textwidth]{contracted}\label{fig:f2}}
+  \caption{Examples of candidate filtering}
+\end{figure}
 
+\subsection{Dead end filter}
+The first filter is the one most convenient method to avoid unnecessary returns along the planned tour. The idea behind this filter is to remove all candidates that would, if picked, result in tours that have in the immediate surroundings of the turning point one or more recurring segments. Part of one such tour is displayed in the FIGURE(fill in). Aside from this positive effect, there is also one tradeoff that has to be done. In this problem we take into account the hard constraint on the total length of the tour determined by interval \(L\). By limiting the candidate set you can encounter cases where every tour found is too short and this small segment of return around turning point would add up the length needed in order to get above the lower bound of the interval. \par
+The filtering itself run in multiple steps. The first one will remove all the nodes that have only one neighbour in the graph. Each next step will extend this rule to ignore already removed candidates as neighbours. Both steps are pictured in the FIGURE(fill in) where black nodes show candidate nodes, orange ones show nodes removed in the first step and the purple one is the node removed in the next step. Another option to mitigate these tours with returns is to preprocess graph itself before the planner is run. We didn't persue that approach, because althoug we don't want to choose this dead ends as \(t\) we still want this nodes to be available for user to choose them as start node \(s\) or goal node \(g\).
+
+\begin{figure}
+	\includegraphics[width=0.7\textwidth]{return.png}
+	\caption{Tour with return from turning point located in one of dead ends of the graph}
+\end{figure}
+
+\subsection{Contraction node filter} 
+Second filter which we proposed and implemented is intended to lower the total number of candidates and higher their mean distance by removing candidates which are surrounded by other acceptable candidates. One of these nodes is pictured in orange in FIGURE(fill in). These nodes have very small impact on quality of the final solution. To explain why, we just need to imagine the case of one simple edge between two points (say \(f\) and \(s\)) with single via node \(v\) in the middle. The via point is of degree 2 and the nodes at the start and end of the edge are of degree 2 or more. Moreover all three nodes are in the candidate set. We choose the point \(v\) as our turning point. It is easy to prove that the path found to this node is (except the very last segment) the same as path found to either \(f\) or \(s\). To revolve around specific case let's think of \(f\). The best path back goes either through \(s\) or \(f\) again. The latter case results in path which is very similar to the one we would get if we chose the the node \(f\) itself, except it has the return around turning point similar to the one described in previous section. The former would result in nice smooth tour. But if this is the case, we would get exactly the same result choosing \(f\) or \(s\) as turning point. Therefor we can neglect that via node with ease. This also holds in more general case when the will be contracted node is of degree more than two with all neighbours in the candidate set. \par
+On the top of positive effects on the candidate set mentioned in the opening sentence of this section we get the same tradeoff as in the previous section with this filter. It prunes the solution space from solutions with returns. As mentioned previously this is beneficial to the smoothness of found solutions but also some quite acceptable solutions with returns will be inevitably pruned.
+
+\subsection{Path to distance ratio filter}
 
 
 \section{Branch and bound algorithm}
-The second version of the backward path algorithm does not use any filters. This version employes different strategy which uses path to the candidate itself instead of single point in order to get the best results. After candidate is picked it gets all nodes on the path from starting node as use every one of them as a turning point. From each of them is run a version of the backward search described above. As the searches go they are filtered by length criterium and sorted by best cost mean. The best one is then returned as the result for that original candidate.
+The second version of the backward path algorithm does not use any filters and it is very similar to the original version of the algorithm. This version employes different strategy which uses path to the candidate itself instead of single point in order to get the best results. After candidate is picked it gets all nodes on the path from starting node to use every one of them as a turning point \(t\). From each of them is run a version of the backward search described above. As the searches go they are filtered by length criterium and sorted by best cost mean. The best one is then returned as the result for that original candidate.
 As I said, this method does not implement filters, but the techniques used for picking the candidates are even more uself than in the first version of the algorithm. Best mean cost path means every segment starting in the \(s\) on that forward path has also the best mean cost. Geospatial diverse candidates are also needed otherwise you could end up iterating many nodes common between close candidates with similar paths multiple times.
 We can also restrict the amount of turning points obtained from each candidate. We will simply introduce parameter \(\beta\) which will determine how close we can get to the starting point when getting turning points from the candidate. Specifically we will take into account only nodes \(n\) for which stands \(d(s, n) > \beta\frac {l_{des}-\varepsilon} 2, 1 > \beta > 0\). For values of \(\beta\) closer to zero there is almost no drop in saved resources and quality of the results. Values close to one will drop the whole first half of turning points from the set. 
 
 
 \chapter{Implementation}
+To demonstrate algorithms described above I implemented them as a Java application using Open Source libraries. It is furthermore wrapped as a webservice exposing REST API. Every application can submit parameterized requests for route planning. Best routes are then returned as a response. On top of that I build simple web client in Javascript which can consume the web service and make the process easier for a person. It also provides visualizations and debugging data. All these programs and their architectures are described more thoroughly in the next sections. There is a public version of both client and server code available at the root repository for this thesis.\cite{git}
 \begin{figure}[H]
 	\includegraphics[width=0.9\textwidth]{communication}
 	\caption{Simple schema of implementation part of this project.}
 \end{figure}
 
-To demonstrate algorithms described above I implemented them as a Java application using Open Source libraries. It is furthermore wrapped as a webservice exposing REST API. Every application can submit parameterized requests for route planning. Best routes are then returned as a response. On top of that I build simple web client in Javascript which can consume the web service and make the process easier for a person. It also provides visualizations and debugging data. All these programs and their architectures are described more thoroughly in the next sections.
-
 
 \section{Implementation description}
+The service and underlying implementation of previously described algorithms is implemented in Java version 8. The whole project is managed in Maven. There are several core dependencies worth mentioning. I implemented the API using Jersey Framework in combination with standart Java Servlet API. This framework makes creating RESTful APIs much easier. It enables using of specific annotations, package specification, custom request filters and more. On top of that Jersey gives out the Jersey Maven plugin. This plugin can deploy the server instance in one command \codeword{mvn clean jetty:run}. After running this command the server is ready to accept the requests to its endpoints via port 8080. \par
+\begin{figure}[H]
+	\includegraphics[width=0.8\textwidth]{service.png}
+	\caption{Service objects structure}
+\end{figure}
+Created API and service infrastructure was linked to the \codeword{PlannerService} object that could be seen in the figure. This static object manages all backend logic. At the start of the service it loads graph, creates index over all nodes, create complementary objects as are \codeword{CandidateFinder} or \codeword{BackpathFinder} and more. After this boot up phase it exposes method which corespond to web service endpoints and supply the planning functionality over the API. Every planning request has three stages of execution which are described below. For the representation of graph and its individual features I chose to implement interfaces from \codeword{base-structures} library provided to me by Umotional company. Its interfaces which I used (more specifically \codeword{INode}, \codeword{IEdge} and \codeword{GraphStructure}) encapsulates basic methods on the objects in order to make it absolutely convenient to work with them. Implementations of all these interfaces which I used are available in \codeword{model} package. Second big motivation for this approach was the ability of other libraries to work with these interfaces. \par
+To implement forward and backward searches themselves I chosed to use yet another open source library from Umotional company. It is \codeword{core-planning-algorithms}. The library provides functional framework to implement almost any graph search algorithm. It creates higher level of abstraction with help of several general interfaces that encapsulates the basic actors or methods present in every graph search. Everyone can than create their own implementation of these interfaces. Moreover it already provides implementation of basic well-known algorithms as is for example Dijkstra or A*. I used this implementation of Dijkstra, in combinantion with custom made classes pictured in the picture below. 
+
+\begin{figure}[H]
+	\includegraphics[width=0.6\textwidth]{search.png}
+	\caption{Structure of objects used in searches}
+\end{figure}
+
+
+
 \section{Communication}
+As I mentioned before the protocol used in communication with server is REST. There are several methods that can be invoked via web call to relevant endpoint. Each method accepts data in form of querry parameters that are passed on to the service implementation as arguments.
+
+\begin{figure}[H]
+	\includegraphics[width=0.7\textwidth]{api.png}
+	\caption{Planning request and response objects}
+\end{figure}
+
+\subsection{Closed Tours endpoint}
+
+\subsection{P2P Tours endpoint}
+
+\subsection{Nearest Node endpoint}
+The core functionality of the service i.e. the planning of the tours described above is designed to accept just a node id as a part of the TourRequest. Although this makes the communication easier from development side of view it is not very convenient for the end user. Therefor this endpoint is available - to translate pair of coordinates into the id of the nearest node in the graph. The most obvious use case for this endpoint which is also used in my client implementation is to let the user click at some point in the map and obtain the nearest node id to use in the actual request. \par
+The inner working of this method is provided by KDTree object. This static object is created together with the service and filled up with every node in used graph. We choose object dimension in the size of two as our coordinates has two components also. This allow us to use the basic great circle distance of two points as the resolver function when searching through the KDTree. In the end this approach greatly outspeed sorting or filtering nodes in simple list, but with slightly worse space complexity.
+
+\subsection{Graph Borders endpoint}
+This is just a simple enpoint that serves to either visualize the graph borders in the client appliccation or to restrict the requests entered by user to fit currentlly loaded graph.  It returns the greater bouunding box of the graph in GeoJson format. 
+
+
 \section{Client}
 
 \chapter{Results}
@@ -150,5 +219,6 @@ To demonstrate algorithms described above I implemented them as a Java applicati
 	\bibitem{oatsp}Maervoet, J., Brackman, P., Verbeeck, K., De Causmaecker, P., \& Vanden Berghe, G. (2013). \emph{Tour Suggestion for Outdoor Activities}. In Web and Wireless Geographical Information Systems (s. 54–63). Springer Berlin Heidelberg. \url{https://doi.org/10.1007/978-3-642-37087-8_5} 
 	\bibitem{jogging}Gemsa, A., Pajor, T., Wagner, D., \& Zündorf, T. (2013). \emph{Efficient Computation of Jogging Routes.} In Experimental Algorithms (s. 272–283). Springer Berlin Heidelberg. \url{https://doi.org/10.1007/978-3-642-38527-8_25} 
 	\bibitem{juraska} Juraska, J., Nykl J. (2016). \emph{Multi-criteria Route Planning with Emphasis on Geospatial Result Diversity} \url{https://www.semanticscholar.org/paper/Multi-criteria-Route-Planning-with-Emphasis-on-Juraska-Nykl/96165d905691de3b8e9b0af8b83fc2e68941b59c}
+	\bibitem{git} Matocha, M., \emph{bp}, (2019), GitHub repository, \url{https://github.com/Shade254/bp}
 \end{thebibliography}
 \end{document}

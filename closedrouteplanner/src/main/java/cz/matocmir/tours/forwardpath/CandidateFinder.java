@@ -32,9 +32,9 @@ public class CandidateFinder {
 		Candidate startCan = new Candidate(new TreeNode(null, null, start), 0, 0);
 		ForwardPathGoalChecker gc = new ForwardPathGoalChecker(request.getMinLength(), goal);
 		ForwardPathLabel startLabel = new ForwardPathLabel(start.getId(), new int[] { 0 }, null, startCan);
-		Point2PointLabelFactory labelFactory;
+		ForwardPathLabelFactory labelFactory;
 
-		labelFactory = new Point2PointLabelFactory(graph, start.getId(), request.getMaxLength());
+		labelFactory = new ForwardPathLabelFactory(graph, start.getId(), request.getMaxLength());
 
 		ShortestPathAlgorithm<ForwardPathLabel, ForwardPath> alg = new Dijkstra(labelFactory, startLabel, gc,
 				new ForwardPathFactory());

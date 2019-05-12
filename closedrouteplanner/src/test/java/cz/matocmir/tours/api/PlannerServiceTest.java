@@ -70,11 +70,11 @@ public class PlannerServiceTest {
 	@Test
 	public void performanceByTourCount() {
 
-		TourRequest request = new TourRequest(1392, -1, 400, 0.9, 4000, 6000);
+		TourRequest request = new TourRequest(27509, -1, 450, 0.9, 12000, 15000);
 
 
-		int minTries = 1;
-		int maxTries = 30;
+		int minTries = 5;
+		int maxTries = 50;
 
 		List<Double> scores1 = new ArrayList<>();
 		List<Double> scores2 = new ArrayList<>();
@@ -110,6 +110,9 @@ public class PlannerServiceTest {
 		System.out.println("=============================================================================");
 		System.out.println(time1);
 		System.out.println(time2);
+		System.out.println("=============================================================================");
+		System.out.println(service.notFound1);
+		System.out.println(service.notFound2);
 
 
 

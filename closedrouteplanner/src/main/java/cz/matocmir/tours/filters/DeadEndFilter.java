@@ -24,7 +24,7 @@ public class DeadEndFilter implements CandidateFilter {
 	}
 
 	public List<Candidate> filterDeadEnds(List<Candidate> unfiltred, TourGraph graph) {
-		IOUtils.visualizeNodes(unfiltred.stream().map(e -> e.correspNode.getNode()).collect(Collectors.toList()), "original.geojson");
+		//IOUtils.visualizeNodes(unfiltred.stream().map(e -> e.correspNode.getNode()).collect(Collectors.toList()), "original.geojson");
 		List<Candidate> filtered = new ArrayList<>();
 		List<Candidate> removed = new ArrayList<>();
 		for (Candidate c : unfiltred) {
@@ -46,7 +46,7 @@ public class DeadEndFilter implements CandidateFilter {
 
 		System.out.println(removed.size() + " removed after first step (Dead ends)");
 
-		IOUtils.visualizeNodes(filtered.stream().map(e -> e.correspNode.getNode()).collect(Collectors.toList()), "filter1.geojson");
+		//IOUtils.visualizeNodes(filtered.stream().map(e -> e.correspNode.getNode()).collect(Collectors.toList()), "filter1.geojson");
 		return secondStep(filtered, removed);
 	}
 
@@ -70,7 +70,7 @@ public class DeadEndFilter implements CandidateFilter {
 		}
 
 		System.out.println(removedIds.size() + " removed after first step (Dead ends)");
-		IOUtils.visualizeNodes(secondFiltered.stream().map(e -> e.correspNode.getNode()).collect(Collectors.toList()), "filter2.geojson");
+		//IOUtils.visualizeNodes(secondFiltered.stream().map(e -> e.correspNode.getNode()).collect(Collectors.toList()), "filter2.geojson");
 		return secondFiltered;
 	}
 }

@@ -56,21 +56,21 @@ public class ClosedBackPathLabelFactory implements LabelFactory<BackPathLabel> {
 		return labels;
 	}
 
-	private double countWeight(TourEdge newEdge, double backLength) {
-		double total_distance = forwardLength + backLength + (newEdge.getLengthInMeters() / 2);
+	private double countWeight(TourEdge e, double length) {
+		double total_distance = forwardLength + length + (e.getLengthInMeters() / 2);
 		double distance = total_distance;
 
 		double roundnessPenalty = 0;
-		for (TourEdge e : forwardPath) {
-			distance -= (e.getLengthInMeters() / 2);
-			double penalty = newEdge.roundnessPenalty(e, Math.min(distance, maxLength - distance), strictness);
-			roundnessPenalty += (penalty * e.getLengthInMeters() * newEdge.getLengthInMeters());
-			distance -= (e.getLengthInMeters() / 2);
+		for (TourEdge e1 : forwardPath) {
+			distance -= (e1.getLengthInMeters() / 2);
+			double penalty = e1.roundnessPenalty(e1, Math.min(distance, maxLength - distance), strictness);
+			roundnessPenalty += (penalty * e1.getLengthInMeters() * e1.getLengthInMeters());
+			distance -= (e1.getLengthInMeters() / 2);
 		}
 
 		roundnessPenalty /= maxLength;
 		roundnessPenalty *= (2 * factor);
 
-		return (newEdge.getCost() + roundnessPenalty);
+		return (e.getCost() + roundnessPenalty);
 	}
 }

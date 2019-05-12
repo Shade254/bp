@@ -22,7 +22,7 @@ public class PlannerAPI {
 	@GET
 	@Path("/closed")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getClosedTour(@QueryParam("start") Integer startId, @QueryParam("minLength") Integer minLength,
+	public Response getClosedTours(@QueryParam("start") Integer startId, @QueryParam("minLength") Integer minLength,
 			@QueryParam("maxLength") Integer maxLength, @DefaultValue("-1") @QueryParam("tours") Integer toursNumber,
 			@DefaultValue("-1") @QueryParam("strict") Double strictness,
 			@DefaultValue("-1") @QueryParam("factor") Double factor, @DefaultValue("1") @QueryParam("method") Boolean method) {
@@ -51,7 +51,7 @@ public class PlannerAPI {
 	@GET
 	@Path("/p2p")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getP2PTour(@QueryParam("start") Integer startId, @QueryParam("goal") Integer goalId,
+	public Response getP2PTours(@QueryParam("start") Integer startId, @QueryParam("goal") Integer goalId,
 			@QueryParam("minLength") Integer minLength, @QueryParam("maxLength") Integer maxLength,
 			@DefaultValue("-1") @QueryParam("tours") Integer toursNumber,
 			@DefaultValue("-1") @QueryParam("strict") Double strictness,
@@ -90,30 +90,6 @@ public class PlannerAPI {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getNearestNode(@QueryParam("lat") double lat, @QueryParam("lon") double lon) {
 		return Response.ok().entity(service.getNearestNode(new double[] { lon, lat })).build();
-	}
-
-	@GET
-	@Path("/test")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String hello() {
-		double latMin = 50.051500;
-		double latMax = 50.100559;
-		double lonMin = 14.395430;
-		double lonMax = 14.532180;
-		Random r = new Random();
-
-		double rndLat1 = latMin + (latMax - latMin) * r.nextDouble();
-		double rndLat2 = latMin + (latMax - latMin) * r.nextDouble();
-		double rndLon1 = lonMin + (lonMax - lonMin) * r.nextDouble();
-		double rndLon2 = lonMin + (lonMax - lonMin) * r.nextDouble();
-
-		return String.format("[{\n" + "  \"type\": \"FeatureCollection\",\n" + "  \"features\": [{\n"
-				+ "      \"type\": \"Feature\",\n" + "      \"geometry\": {\n" + "        \"type\": \"LineString\",\n"
-				+ "        \"coordinates\": [[%.5f, %.5f],[%.5f, %.5f]]},\n" + "      \"properties\": {\n"
-				+ "\t       \"name\": \"Anglická\",\n" + "\t       \"from\": \"Škrétova\",\n"
-				+ "\t       \"to\": \"null\",\n" + "\t       \"MC\": \"Praha 2\",\n"
-				+ "\t       \"forwardTransits\": \"0\",\n" + "\t       \"backwardTransits\": \"0\"\n" + "      }\n"
-				+ "    }]\n" + "}]", rndLon1, rndLat1, rndLon2, rndLat2);
 	}
 
 	private String bbToGeojson(BoundingBox bb) {

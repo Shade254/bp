@@ -11,7 +11,7 @@ public class CandidatesPicker {
 	private List<Candidate> candidates;
 	private double[] probabilities;
 	private double[] distances;
-	private double[] unpleasantnesses;
+	private double[] unpleasantness;
 	private Random r;
 	private double centerLat;
 	private double centerLon;
@@ -29,7 +29,7 @@ public class CandidatesPicker {
 		for (int i = 0; i < candidates.size(); i++)
 			distances[i] = Double.MAX_VALUE;
 
-		unpleasantnesses = new double[candidates.size()];
+		unpleasantness = new double[candidates.size()];
 
 		//create histogram
 		int[] unpleasantnessBins = new int[101];
@@ -37,7 +37,7 @@ public class CandidatesPicker {
 		for (Candidate c : candidates) {
 			if (c.length != 0) {
 				double d = c.weight / (c.length / 100);
-				unpleasantnesses[pos] = d;
+				unpleasantness[pos] = d;
 				int binNr = (int) (d * 10);
 				if (binNr >= unpleasantnessBins.length)
 					binNr = unpleasantnessBins.length - 1;
@@ -50,9 +50,9 @@ public class CandidatesPicker {
 		int sum = 0, pos10 = -1, pos50 = -1;
 		for (int i = 0; i < unpleasantnessBins.length; i++) {
 			sum += unpleasantnessBins[i];
-			if (sum > unpleasantnesses.length / 10 && pos10 == -1)
+			if (sum > unpleasantness.length / 10 && pos10 == -1)
 				pos10 = i;
-			if (sum > unpleasantnesses.length / 2 && pos50 == -1)
+			if (sum > unpleasantness.length / 2 && pos50 == -1)
 				pos50 = i;
 		}
 
@@ -61,11 +61,11 @@ public class CandidatesPicker {
 			double pos10unpleasantness = pos10 / 10.;
 			double factor = Math.log(0.25) / (1 - (pos50 + 1.) / pos10);
 			for (int i = 0; i < probabilities.length; i++) {
-				unpleasantnesses[i] = Math.exp(factor * Math.min(0, (1 - unpleasantnesses[i] / pos10unpleasantness)));
+				unpleasantness[i] = Math.exp(factor * Math.min(0, (1 - unpleasantness[i] / pos10unpleasantness)));
 			}
 		} else {
 			for (int i = 0; i < probabilities.length; i++)
-				unpleasantnesses[i] = 1;
+				unpleasantness[i] = 1;
 		}
 
 		// Set the probabilities
@@ -129,7 +129,7 @@ public class CandidatesPicker {
 		//starting value
 		if (maxDistance == Double.MAX_VALUE) {
 			for (int i = 0; i < probabilities.length; i++) {
-				probabilities[i] = unpleasantnesses[i];
+				probabilities[i] = unpleasantness[i];
 			}
 		} else if (maxDistance == 0) {
 			for (int i = 0; i < probabilities.length; i++) {

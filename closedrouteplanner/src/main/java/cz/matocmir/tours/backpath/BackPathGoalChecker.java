@@ -5,15 +5,15 @@ import cz.matocmir.tours.model.TourNode;
 
 public class BackPathGoalChecker implements GoalChecker<BackPathLabel> {
 	private boolean searchFinished = false;
-	private TourNode startingPoint;
+	private TourNode goalNode;
 
-	public BackPathGoalChecker(TourNode startingPoint) {
-		this.startingPoint = startingPoint;
+	public BackPathGoalChecker(TourNode goalNode) {
+		this.goalNode = goalNode;
 	}
 
 	@Override
 	public boolean visitGoal(BackPathLabel current) {
-		searchFinished = (current.getCandidate().correspNode.getNode().getId() == startingPoint.getId());
+		searchFinished = (current.getCandidate().correspNode.getNode().getId() == goalNode.getId());
 		return searchFinished;
 	}
 

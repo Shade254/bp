@@ -114,7 +114,7 @@ public class TourUtils {
 			}
 
 			BackPathFinder backFinder = new BackPathFinder(graph);
-			Tour pathBack = backFinder.getCompletedPath(c, request);
+			Tour pathBack = backFinder.completeClosedTourFromForwardPath(c, request);
 			if (pathBack == null || pathBack.getOriginalEdges() == null || pathBack.getOriginalEdges().isEmpty()) {
 				continue;
 			}

@@ -37,7 +37,7 @@ public class ContractedNodesFilter implements CandidateFilter{
 		}
 
 		System.out.println((cands.size()-filtered.size()) + " removed after first step (Contraction)");
-		IOUtils.visualizeNodes(filtered.stream().map(e -> e.correspNode.getNode()).collect(Collectors.toList()), "filter3.geojson");
+		//IOUtils.visualizeNodes(filtered.stream().map(e -> e.correspNode.getNode()).collect(Collectors.toList()), "filter3.geojson");
 		return filtered;
 	}
 }

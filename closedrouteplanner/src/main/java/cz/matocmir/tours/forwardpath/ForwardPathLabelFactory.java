@@ -10,14 +10,14 @@ import cz.matocmir.tours.utils.TourUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Point2PointLabelFactory implements LabelFactory<ForwardPathLabel> {
+public class ForwardPathLabelFactory implements LabelFactory<ForwardPathLabel> {
 	private static final double epsilon = 0.001;
 	private TourGraph graph;
 	private int goalNode;
 	private double maxLength;
 	List<Candidate> boundaryNodes;
 
-	public Point2PointLabelFactory(TourGraph graph, int goalNode, double maxLength) {
+	public ForwardPathLabelFactory(TourGraph graph, int goalNode, double maxLength) {
 		this.graph = graph;
 		this.goalNode = goalNode;
 		this.maxLength = maxLength;

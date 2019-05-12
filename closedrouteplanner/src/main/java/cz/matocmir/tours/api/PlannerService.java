@@ -31,6 +31,9 @@ public class PlannerService {
 	private KDTree<TourNode> nodesTree;
 	private List<CandidateFilter> filters;
 
+	public List<Integer> notFound1 = new ArrayList<>();
+	public List<Integer> notFound2 = new ArrayList<>();
+
 	PlannerService() {
 		log.info("Graph loaded");
 		nodesTree = new KDTree<>(2, new TourNodeResolver<>());
@@ -60,6 +63,7 @@ public class PlannerService {
 
 	public TourResponse getClosedTours2(TourRequest request, int toursNumber) throws IllegalArgumentException {
 		log.info("Starting CLOSED-2 for request " + request.toString());
+		int counter = 0;
 		long stopwatch = System.currentTimeMillis();
 		TourResponse response = new TourResponse();
 
@@ -99,6 +103,8 @@ public class PlannerService {
 				System.out.println(paths.size() + ". path to goal found");
 				paths.add(foundPath);
 				foundCycles++;
+			} else {
+				counter++;
 			}
 
 			if (foundCycles >= toursNumber) {
@@ -115,12 +121,14 @@ public class PlannerService {
 
 		response.setResponseTime(System.currentTimeMillis() - stopwatch);
 		response.setTours(paths.toArray(new Tour[0]));
+		notFound2.add(counter);
 
 		return response;
 	}
 
 	public TourResponse getClosedTours(TourRequest request, int toursNumber) throws IllegalArgumentException {
 		log.info("Starting CLOSED for request " + request.toString());
+		int counter = 0;
 		long stopwatch = System.currentTimeMillis();
 		TourResponse response = new TourResponse();
 
@@ -148,12 +156,14 @@ public class PlannerService {
 			if (randomCand == null || randomCand.correspNode == null)
 				continue;
 
-			foundPath = backPathFinder.getCompletedPath(randomCand, request);
+			foundPath = backPathFinder.completeClosedTourFromForwardPath(randomCand, request);
 
 			if (foundPath != null && foundPath.getOriginalEdges() != null && !foundPath.getOriginalEdges().isEmpty()) {
 				System.out.println(paths.size() + ". path to goal found");
 				paths.add(foundPath);
 				foundCycles++;
+			} else {
+				counter++;
 			}
 
 			if (foundCycles >= toursNumber) {
@@ -170,6 +180,8 @@ public class PlannerService {
 
 		response.setResponseTime(System.currentTimeMillis() - stopwatch);
 		response.setTours(paths.toArray(new Tour[0]));
+
+		notFound1.add(counter);
 
 		return response;
 	}
@@ -209,7 +221,7 @@ public class PlannerService {
 				continue;
 			}
 
-			Tour tour = backPathFinder.getBestPathBack(turningPoint, request);
+			Tour tour = backPathFinder.completeP2PTourFromForwardPath(turningPoint, request);
 			if (tour != null && tour.getOriginalEdges() != null && !tour.getOriginalEdges().isEmpty()) {
 				System.out.println(foundWalks + ". path to goal found");
 				result.add(tour);
@@ -281,7 +293,7 @@ public class PlannerService {
 
 			Tour tour;
 			BackPath bp = backPathFinder
-					.getPathsWithRoundness(request, turningPoint.correspNode.getNode(), turningPoint.length,
+					.getPathWithRoundness(request, turningPoint.correspNode.getNode(), turningPoint.length,
 							forwardPath);
 
 			if (bp == null)

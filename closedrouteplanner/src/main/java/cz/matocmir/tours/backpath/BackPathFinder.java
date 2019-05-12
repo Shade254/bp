@@ -23,10 +23,11 @@ public class BackPathFinder {
 		this.graph = graph;
 	}
 
+	// get best backpath and complete Tour from single turning point
 	public Tour getPathFromTurningPoint(TourRequest request, Candidate cand) {
 		List<TourEdge> forwardPath = cand.correspNode.pathFromRoot().stream().map(TreeNode::getEdgeFromParent)
 				.filter(Objects::nonNull).collect(Collectors.toList());
-		BackPath bp = getPathsWithRoundness(request, cand.correspNode.getNode(), cand.length, forwardPath);
+		BackPath bp = getPathWithRoundness(request, cand.correspNode.getNode(), cand.length, forwardPath);
 		if (bp == null)
 			return null;
 
@@ -44,7 +45,9 @@ public class BackPathFinder {
 		return new Tour(completePath, cand.correspNode.getNode(), cand.correspNode.getNode(), totalCost);
 	}
 
-	public Tour getCompletedPath(Candidate candidate, TourRequest request) {
+
+	// get best BackPath and complete tour from whole forwardPath
+	public Tour completeClosedTourFromForwardPath(Candidate candidate, TourRequest request) {
 		Tour response = null;
 
 		TourNode startingNode = graph.getNode(request.getStartNode());
@@ -70,7 +73,7 @@ public class BackPathFinder {
 				continue;
 			}
 
-			BackPath bp = getPathsWithRoundness(request, forwardPath.get(i).getNode(), forwardLength,
+			BackPath bp = getPathWithRoundness(request, forwardPath.get(i).getNode(), forwardLength,
 					partialForwardPath);
 
 			if (bp == null)
@@ -95,7 +98,9 @@ public class BackPathFinder {
 		return response;
 	}
 
-	public BackPath getPathsWithRoundness(TourRequest request, TourNode start, double forwardLength,
+
+	// get single best BackPath from single turning point
+	public BackPath getPathWithRoundness(TourRequest request, TourNode start, double forwardLength,
 			List<TourEdge> forwardPath) {
 		TourNode st = graph.getNode(request.getStartNode());
 		TourNode go = graph.getNode(request.getGoalNode());
@@ -130,7 +135,9 @@ public class BackPathFinder {
 		return res.get(0);
 	}
 
-	public Tour getBestPathBack(Candidate lastTurningPoint, TourRequest request) {
+
+	// get best BackPath and complete tour from whole forwardPath
+	public Tour completeP2PTourFromForwardPath(Candidate lastTurningPoint, TourRequest request) {
 		Tour response = null;
 		ArrayList<TreeNode> forwardPath = lastTurningPoint.correspNode.pathFromRoot();
 		ArrayList<TourEdge> partialForwardPath = new ArrayList<>();
@@ -156,7 +163,7 @@ public class BackPathFinder {
 				continue;
 			}
 
-			BackPath pathBack = this.getPathsWithRoundness(request, turnP, forwardLength, partialForwardPath);
+			BackPath pathBack = this.getPathWithRoundness(request, turnP, forwardLength, partialForwardPath);
 
 			if (pathBack != null) {
 				Candidate last = pathBack.getLastLabelObjId().getCandidate();

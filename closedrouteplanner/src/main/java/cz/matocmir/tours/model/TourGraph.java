@@ -52,14 +52,6 @@ public class TourGraph implements GraphStructure<TourNode, TourEdge>, Serializab
 		}
 	}
 
-	public void addNode(int id, double lat, double lon) {
-		if (!this.containsNode(id)) {
-			nodes.put(id, new TourNode(lat, lon, id));
-			outgoingEdges.putIfAbsent(id, new ArrayList<>());
-			incomingEdges.putIfAbsent(id, new ArrayList<>());
-		}
-	}
-
 	@Override
 	public boolean containsNode(TourNode tourNode) {
 		return containsNode(tourNode.getId());
