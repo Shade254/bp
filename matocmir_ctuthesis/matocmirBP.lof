@@ -1,0 +1,43 @@
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {czech}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {czech}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Visualization of distance and displacement in a circle\relax }}{14}{figure.4.1}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Description of original algorithm\relax }}{15}{figure.4.2}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Examples of candidate filtering\relax }}{20}{figure.4.3}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Removing dead ends}}}{20}{subfigure.3.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Node contraction}}}{20}{subfigure.3.2}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Tour with return from turning point located in one of dead ends of the graph\relax }}{21}{figure.4.4}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Graph objects structure\relax }}{24}{figure.5.1}
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Structure of objects used in searches\relax }}{25}{figure.5.2}
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Service objects structure\relax }}{26}{figure.5.3}
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Simple schema of implementation part of this project.\relax }}{26}{figure.5.4}
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Planning request and response objects\relax }}{27}{figure.5.5}
+\contentsline {figure}{\numberline {5.6}{\ignorespaces UI of the web client\relax }}{29}{figure.5.6}
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Tour visualized in the web client\relax }}{30}{figure.5.7}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Mean costs of best found tour in relation to candidate subset size\relax }}{32}{figure.6.1}
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Response time of each method in relation to candidate subset size\relax }}{34}{figure.6.2}
+\contentsline {figure}{\numberline {6.3}{\ignorespaces Mean costs of best found tour in relation to lower bound of the interval\relax }}{35}{figure.6.3}
+\contentsline {figure}{\numberline {6.4}{\ignorespaces Response time of each method in relation to lower bound of the interval\relax }}{36}{figure.6.4}
+\contentsline {figure}{\numberline {6.5}{\ignorespaces Average roundness penalty of best found tour in relation to value of \(\lambda \)\relax }}{37}{figure.6.5}
+\contentsline {figure}{\numberline {6.6}{\ignorespaces Average roundness penalty of best found tour in relation to value of \(\sigma \)\relax }}{38}{figure.6.6}
+\addvspace {10\p@ }

@@ -1,4 +1,5 @@
-var port = 8080;
+//var address = 'http://localhost:8080';
+var address = 'http://test.umotional.net/tour-planner';
 
 	// flag of choosed planning mode(closed, p2p)
 	var which;
@@ -23,6 +24,8 @@ var port = 8080;
 	});
 
   	document.getElementById("closedTourButton").click();
+	document.getElementById("loader").style.display="none";
+	document.getElementById("select-based-flipswitch").value="second";
 
   	// switching tabs
 	function openTab(evt, tourName) {
@@ -155,7 +158,7 @@ var port = 8080;
 			}
 		}
 
-		borderRequest.open('GET', 'http://localhost:'+ port +'/border', true)
+		borderRequest.open('GET', address + '/border', true)
 		borderRequest.send()
 	});
 
@@ -163,7 +166,12 @@ var port = 8080;
 	// this response contains individual tours for display as well as metadata about length, roundness, etc.
 	var request = new XMLHttpRequest()
 	request.onload = function () {
+		document.getElementById("loader").style.display="none";
 		console.log(request.status)
+		var button = document.getElementById("submitBtn");
+		button.disabled = false;
+		button.value = 'Submit';
+
 		if(request.status == 200){
 			var data = JSON.parse(this.response)
 			console.log(data);
@@ -176,7 +184,8 @@ var port = 8080;
 
     		for(var i = data.tours.length; i>0 ; --i) {
         		var option = document.createElement('option');
-        		option.text = option.value = i;
+        		option.value = i;
+        		option.text = "Tour number " + i;
         		select.add(option, 0);
     		}
 			document.getElementById("timeInfo").innerHTML = "Response time - " + data.responseTime + " ms";
@@ -187,7 +196,7 @@ var port = 8080;
 			document.getElementById("lengthInfo").innerHTML = "Length - " + data.tours[0].length + " m";
 			document.getElementById("roundnessInfo").innerHTML = "Roundness - " + parseFloat(data.tours[0].roundness).toFixed(5);
 			document.getElementById("totalInfo").innerHTML = "Total cost - " + data.tours[0].totalCost;
-			select.value = 1
+			select.value = select.options[0];
 			
 			select.onchange=function(e){
 				map.getSource('closedwalk').setData(data.tours[parseInt(e.target.value)-1].path)
@@ -264,7 +273,7 @@ var port = 8080;
 
 
 		}
-		var url = 'http://localhost:'+port+'/map?lat=' + e.lngLat.lat + '&lon=' + e.lngLat.lng;
+		var url = address + '/map?lat=' + e.lngLat.lat + '&lon=' + e.lngLat.lng;
 		mapRequest.open('GET', url, true)
 		mapRequest.send()
 		console.log(url)
@@ -273,34 +282,31 @@ var port = 8080;
 
 
 // collect info from input fields and send it to the server
-		function submitClick(){
+		function submitClick(e){
+			e.preventDefault();
+
 			var minL, maxL, start, goal, factor, strict, tours, method;
 			if(which == 1){
-				minL = parseInt(document.getElementById("closedMin").value)
-				maxL = parseInt(document.getElementById("closedMax").value)
 				start = parseInt(document.getElementById("closedStart").value)
-				factor = parseFloat(document.getElementById("closedFactor").value)
-				strict = document.getElementById("closedStrict").value
-				tours = parseInt(document.getElementById("closedCount").value)
 			} else {
-				minL = parseInt(document.getElementById("p2pMin").value)
-				maxL = parseInt(document.getElementById("p2pMax").value)
 				start = parseInt(document.getElementById("p2pStart").value)
 				goal = parseInt(document.getElementById("p2pGoal").value)
-				factor = parseFloat(document.getElementById("p2pFactor").value)
-				strict = document.getElementById("p2pStrict").value
-				tours = parseInt(document.getElementById("p2pCount").value)
 			}
 
-			method = document.getElementById("method_select").checked
+			minL = parseInt(document.getElementById("length-min").value)
+			maxL = parseInt(document.getElementById("length-max").value)
+			strict = parseFloat(document.getElementById("strictInput").value)
+			tours = parseInt(document.getElementById("numInput").value)
+			factor = parseInt(document.getElementById("factorInput").value)
+			method=document.getElementById("select-based-flipswitch").value
+
 
 			var url;
 
-
 			if(which == 1){
-				url = 'http://localhost:'+port+'/closed?start='+start+'&minLength='+minL+'&maxLength='+maxL;
+				url = address + '/closed?start='+start+'&minLength='+minL+'&maxLength='+maxL;
 			} else {
-				url = 'http://localhost:'+port+'/p2p?start='+start+'&goal='+goal+'&minLength='+minL+'&maxLength='+maxL;
+				url = address + '/p2p?start='+start+'&goal='+goal+'&minLength='+minL+'&maxLength='+maxL;
 			}
 			
 			if(!isNaN(factor)){
@@ -314,11 +320,18 @@ var port = 8080;
 			if(!isNaN(tours)){
 				url = url + '&tours=' + tours
 			}
-
-			url = url + '&method=' + method
+			
+			if(method == "first"){
+				url = url + '&method=' + 'false'
+			} else {
+				url = url + '&method=' + 'true'
+			}
 
 
 			console.log(url)
+
 			request.open('GET', url, true)
 			request.send()
+			document.getElementById("loader").style.display="block";
+			return false;
 	}

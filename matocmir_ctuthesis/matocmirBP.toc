@@ -1,0 +1,76 @@
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\contentsline {paragraph}{Keywords:}{iv}{paragraph*.1}
+\contentsline {paragraph}{Supervisor:}{iv}{paragraph*.2}
+\babel@toc {czech}{}
+\contentsline {paragraph}{Kl\'i\v cov\'a\ slova:}{iv}{paragraph*.3}
+\contentsline {paragraph}{P\v reklad\ n\'azvu:}{iv}{paragraph*.4}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {czech}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\babel@toc {english}{}
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}
+\contentsline {section}{\numberline {1.1}Motivation}{1}{section.1.1}
+\contentsline {section}{\numberline {1.2}Scope of the Thesis}{2}{section.1.2}
+\contentsline {chapter}{\numberline {2}Related Work}{5}{chapter.2}
+\contentsline {section}{\numberline {2.1}Cycling trips in East Flanders}{5}{section.2.1}
+\contentsline {section}{\numberline {2.2}Minimum Mean Cycle}{5}{section.2.2}
+\contentsline {section}{\numberline {2.3}Solutions proposed by Gemsa}{6}{section.2.3}
+\contentsline {subsection}{\numberline {2.3.1}Greedy Faces}{6}{subsection.2.3.1}
+\contentsline {subsection}{\numberline {2.3.2}Partial Shortest Paths}{7}{subsection.2.3.2}
+\contentsline {section}{\numberline {2.4}Tour Suggestion for Outdoor Activities}{8}{section.2.4}
+\contentsline {section}{\numberline {2.5}Generating Constrained Length Personalized Bicycle Tours}{9}{section.2.5}
+\contentsline {chapter}{\numberline {3}Problem}{11}{chapter.3}
+\contentsline {section}{\numberline {3.1}Graph}{11}{section.3.1}
+\contentsline {section}{\numberline {3.2}Constraint Length Bicycle Tour Problem}{12}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Inputs to the Problem}{12}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2.2}Formal Description of the Problem}{12}{subsection.3.2.2}
+\contentsline {chapter}{\numberline {4}Solution Proposal}{13}{chapter.4}
+\contentsline {section}{\numberline {4.1}Tour Roundness}{13}{section.4.1}
+\contentsline {section}{\numberline {4.2}Original Method for Generating Closed Tours}{15}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Forward Routing}{16}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.2}Backward Routing}{16}{subsection.4.2.2}
+\contentsline {subsection}{\numberline {4.2.3}Selecting the Best Result}{17}{subsection.4.2.3}
+\contentsline {subsection}{\numberline {4.2.4}Extension to Point-to-Point Tours}{18}{subsection.4.2.4}
+\contentsline {section}{\numberline {4.3}Modified Version of Generating Tours}{18}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1}Filtering and Selecting Candidates}{19}{subsection.4.3.1}
+\contentsline {subsubsection}{Dead End Filter}{19}{subsubsection*.5}
+\contentsline {subsubsection}{Dead End Filter}{20}{subsubsection*.5}
+\contentsline {subsubsection}{Contraction Node Filter}{20}{subsubsection*.6}
+\contentsline {subsubsection}{Contraction Node Filter}{20}{subsubsection*.6}
+\contentsline {subsubsection}{Path to Distance Ratio Filter}{21}{subsubsection*.7}
+\contentsline {subsubsection}{Path to Distance Ratio Filter}{21}{subsubsection*.7}
+\contentsline {chapter}{\numberline {5}Implementation}{23}{chapter.5}
+\contentsline {section}{\numberline {5.1}Algorithm Implementation}{23}{section.5.1}
+\contentsline {section}{\numberline {5.2}Web Service}{25}{section.5.2}
+\contentsline {subsection}{\numberline {5.2.1}API}{26}{subsection.5.2.1}
+\contentsline {subsubsection}{Closed Tours and P2P Tours Endpoint \\ {\normalfont {\leavevmode {\color {black!70}\texttt {/closed}}}} \\ {\normalfont {\leavevmode {\color {black!70}\texttt {/p2p}}}} }{26}{subsubsection*.8}
+\contentsline {subsubsection}{Closed Tours and P2P Tours Endpoint \\ {\normalfont {\leavevmode {\color {black!70}\texttt {/closed}}}} \\ {\normalfont {\leavevmode {\color {black!70}\texttt {/p2p}}}} }{26}{subsubsection*.8}
+\contentsline {subsubsection}{Nearest Node Endpoint \\ {\normalfont {\leavevmode {\color {black!70}\texttt {/map}}}} }{27}{subsubsection*.9}
+\contentsline {subsubsection}{Nearest Node Endpoint \\ {\normalfont {\leavevmode {\color {black!70}\texttt {/map}}}} }{27}{subsubsection*.9}
+\contentsline {subsubsection}{Graph Borders Endpoint \\ {\normalfont {\leavevmode {\color {black!70}\texttt {/border}}}} }{28}{subsubsection*.10}
+\contentsline {subsubsection}{Graph Borders Endpoint \\ {\normalfont {\leavevmode {\color {black!70}\texttt {/border}}}} }{28}{subsubsection*.10}
+\contentsline {section}{\numberline {5.3}Client Implementation}{28}{section.5.3}
+\contentsline {subsection}{\numberline {5.3.1}User Interface}{28}{subsection.5.3.1}
+\contentsline {subsection}{\numberline {5.3.2}Tour visualization}{29}{subsection.5.3.2}
+\contentsline {section}{\numberline {5.4}How to Run}{29}{section.5.4}
+\contentsline {subsection}{\numberline {5.4.1}Web Service and Client}{29}{subsection.5.4.1}
+\contentsline {subsection}{\numberline {5.4.2}Experiments}{30}{subsection.5.4.2}
+\contentsline {chapter}{\numberline {6}Evaluation}{31}{chapter.6}
+\contentsline {section}{\numberline {6.1}Selected Candidates}{32}{section.6.1}
+\contentsline {section}{\numberline {6.2}Tour Length}{34}{section.6.2}
+\contentsline {section}{\numberline {6.3}Tour Roundness}{35}{section.6.3}
+\contentsline {subsection}{\numberline {6.3.1}Factor}{36}{subsection.6.3.1}
+\contentsline {subsection}{\numberline {6.3.2}Strictness}{37}{subsection.6.3.2}
+\contentsline {chapter}{\numberline {7}Conclusion}{39}{chapter.7}
+\contentsline {chapter}{Bibliography}{41}{chapter*.11}

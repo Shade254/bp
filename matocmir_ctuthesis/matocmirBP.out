@@ -1,0 +1,43 @@
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.1.1}{Motivation}{chapter.1}% 2
+\BOOKMARK [1][-]{section.1.2}{Scope of the Thesis}{chapter.1}% 3
+\BOOKMARK [0][-]{chapter.2}{Related Work}{}% 4
+\BOOKMARK [1][-]{section.2.1}{Cycling trips in East Flanders}{chapter.2}% 5
+\BOOKMARK [1][-]{section.2.2}{Minimum Mean Cycle}{chapter.2}% 6
+\BOOKMARK [1][-]{section.2.3}{Solutions proposed by Gemsa}{chapter.2}% 7
+\BOOKMARK [2][-]{subsection.2.3.1}{Greedy Faces}{section.2.3}% 8
+\BOOKMARK [2][-]{subsection.2.3.2}{Partial Shortest Paths}{section.2.3}% 9
+\BOOKMARK [1][-]{section.2.4}{Tour Suggestion for Outdoor Activities}{chapter.2}% 10
+\BOOKMARK [1][-]{section.2.5}{Generating Constrained Length Personalized Bicycle Tours}{chapter.2}% 11
+\BOOKMARK [0][-]{chapter.3}{Problem}{}% 12
+\BOOKMARK [1][-]{section.3.1}{Graph}{chapter.3}% 13
+\BOOKMARK [1][-]{section.3.2}{Constraint Length Bicycle Tour Problem}{chapter.3}% 14
+\BOOKMARK [2][-]{subsection.3.2.1}{Inputs to the Problem}{section.3.2}% 15
+\BOOKMARK [2][-]{subsection.3.2.2}{Formal Description of the Problem}{section.3.2}% 16
+\BOOKMARK [0][-]{chapter.4}{Solution Proposal}{}% 17
+\BOOKMARK [1][-]{section.4.1}{Tour Roundness}{chapter.4}% 18
+\BOOKMARK [1][-]{section.4.2}{Original Method for Generating Closed Tours}{chapter.4}% 19
+\BOOKMARK [2][-]{subsection.4.2.1}{Forward Routing}{section.4.2}% 20
+\BOOKMARK [2][-]{subsection.4.2.2}{Backward Routing}{section.4.2}% 21
+\BOOKMARK [2][-]{subsection.4.2.3}{Selecting the Best Result}{section.4.2}% 22
+\BOOKMARK [2][-]{subsection.4.2.4}{Extension to Point-to-Point Tours}{section.4.2}% 23
+\BOOKMARK [1][-]{section.4.3}{Modified Version of Generating Tours}{chapter.4}% 24
+\BOOKMARK [2][-]{subsection.4.3.1}{Filtering and Selecting Candidates}{section.4.3}% 25
+\BOOKMARK [0][-]{chapter.5}{Implementation}{}% 26
+\BOOKMARK [1][-]{section.5.1}{Algorithm Implementation}{chapter.5}% 27
+\BOOKMARK [1][-]{section.5.2}{Web Service}{chapter.5}% 28
+\BOOKMARK [2][-]{subsection.5.2.1}{API}{section.5.2}% 29
+\BOOKMARK [1][-]{section.5.3}{Client Implementation}{chapter.5}% 30
+\BOOKMARK [2][-]{subsection.5.3.1}{User Interface}{section.5.3}% 31
+\BOOKMARK [2][-]{subsection.5.3.2}{Tour visualization}{section.5.3}% 32
+\BOOKMARK [1][-]{section.5.4}{How to Run}{chapter.5}% 33
+\BOOKMARK [2][-]{subsection.5.4.1}{Web Service and Client}{section.5.4}% 34
+\BOOKMARK [2][-]{subsection.5.4.2}{Experiments}{section.5.4}% 35
+\BOOKMARK [0][-]{chapter.6}{Evaluation}{}% 36
+\BOOKMARK [1][-]{section.6.1}{Selected Candidates}{chapter.6}% 37
+\BOOKMARK [1][-]{section.6.2}{Tour Length}{chapter.6}% 38
+\BOOKMARK [1][-]{section.6.3}{Tour Roundness}{chapter.6}% 39
+\BOOKMARK [2][-]{subsection.6.3.1}{Factor}{section.6.3}% 40
+\BOOKMARK [2][-]{subsection.6.3.2}{Strictness}{section.6.3}% 41
+\BOOKMARK [0][-]{chapter.7}{Conclusion}{}% 42
+\BOOKMARK [0][-]{chapter*.11}{Bibliography}{}% 43
