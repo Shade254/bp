@@ -20,12 +20,12 @@ public class Tour {
 	double roundness;
 	double totalCost;
 
-	public Tour(List<TourEdge> path, TourNode turningPointLast, TourNode turningPointPlanned, double totalCost) {
+	public Tour(List<TourEdge> path, TourNode turningPointLast, TourNode turningPointPlanned) {
 		this.turningPointLast = IOUtils.nodeToFeature(turningPointLast);
 		this.turningPointPlanned = IOUtils.nodeToFeature(turningPointPlanned);
 		this.length = TourUtils.getPathLength(path);
 		this.roundness = TourUtils.tourPenalty(path, this.length, path.get(0).getFromId() != path.get(path.size()-1).getToId());
-		this.totalCost = totalCost;
+		this.totalCost = TourUtils.getPathCost(path);
 		this.edges = path;
 	}
 

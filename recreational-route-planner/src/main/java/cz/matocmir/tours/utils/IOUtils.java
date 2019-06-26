@@ -1,19 +1,12 @@
 package cz.matocmir.tours.utils;
 
 
-import cz.matocmir.tours.model.Feature;
-import cz.matocmir.tours.model.Geometry;
-import cz.matocmir.tours.model.Type;
-import cz.matocmir.tours.model.TourEdge;
-import cz.matocmir.tours.model.TourNode;
-import cz.matocmir.tours.model.TreeNode;
+import cz.matocmir.tours.model.*;
 import org.apache.log4j.Logger;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class IOUtils {
 	private static final Logger log = Logger.getLogger(IOUtils.class);
@@ -57,46 +50,53 @@ public class IOUtils {
 		return finalString;
 	}
 
+
+	public static String visualizePath(List<TourEdge> edges, TourNode start, TourNode end, TourNode turn) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("{\n" + "  \"type\": \"FeatureCollection\",\n" + "  \"features\": [");
+
+		for (TourEdge edge : edges) {
+			sb.append("{\n" + "      \"type\": \"Feature\",\n" + "      \"geometry\": {\n"
+					+ "        \"type\": \"LineString\",\n" + "        \"coordinates\": [");
+			sb.append(String.format("[%.5f, %.5f],", edge.getFrom().getLongitude(), edge.getFrom().getLatitude()));
+			sb.append(String.format("[%.5f, %.5f]]", edge.getTo().getLongitude(), edge.getTo().getLatitude()));
+			sb.append("},\n");
+			sb.append(String.format("\"properties\": {\n" + "        \"name\": \"%s\"\n" + "      }\n" + "    },",
+					edge.getCost()));
+		}
+
+		sb.append("{\n" + "      \"type\": \"Feature\",\n" + "      \"geometry\": {\n"
+				+ "        \"type\": \"Point\",\n" + "        \"coordinates\": [");
+		sb.append(String.format("[%.5f, %.5f],", start.getLongitude(), start.getLatitude()));
+		sb.append("},\n");
+		sb.append(String.format("\"properties\": {\n" + "        \"name\": \"%s\"\n" + "      }\n" + "    },",
+				start.id));
+
+		sb.append("{\n" + "      \"type\": \"Feature\",\n" + "      \"geometry\": {\n"
+				+ "        \"type\": \"Point\",\n" + "        \"coordinates\": [");
+		sb.append(String.format("[%.5f, %.5f],", end.getLongitude(), end.getLatitude()));
+		sb.append("},\n");
+		sb.append(String.format("\"properties\": {\n" + "        \"name\": \"%s\"\n" + "      }\n" + "    },",
+				end.id));
+
+		sb.append("{\n" + "      \"type\": \"Feature\",\n" + "      \"geometry\": {\n"
+				+ "        \"type\": \"Point\",\n" + "        \"coordinates\": [");
+		sb.append(String.format("[%.5f, %.5f],", turn.getLongitude(), turn.getLatitude()));
+		sb.append("},\n");
+		sb.append(String.format("\"properties\": {\n" + "        \"name\": \"%s\"\n" + "      }\n" + "    },",
+				turn.id));
+
+
+		String finalString = sb.substring(0, sb.length() - 1);
+		finalString += ("]\n" + "}");
+		return finalString;
+	}
+
 	public static String nodeToFeatureString(TourNode node) {
 		String template = "{\n" + "  \"type\": \"Feature\",\n" + "  \"geometry\": {\n" + "    \"type\": \"Point\",\n"
 				+ "    \"coordinates\": [%.5f, %.5f]\n" + "  },\n" + "  \"properties\": {\n" + "    \"name\": \"%s\"\n"
 				+ "  }\n" + "}";
 		return String.format(template, node.getLongitude(), node.getLatitude(), node.getId());
-	}
-
-	public static void visualizePath(List<TreeNode> treeNodes, String jsonFile) {
-		List<TourEdge> edges = treeNodes.stream().map(TreeNode::getEdgeFromParent).filter(Objects::nonNull)
-				.collect(Collectors.toList());
-		List<TourNode> nodes = treeNodes.stream().map(TreeNode::getNode).filter(Objects::nonNull)
-				.collect(Collectors.toList());
-
-		try (PrintStream c = new PrintStream(jsonFile)) {
-
-			c.print("{\n" + "  \"type\": \"FeatureCollection\",\n" + "  \"features\": [");
-			StringBuilder sb = new StringBuilder();
-
-			for (TourNode node : nodes) {
-				sb.append(String.format("{\n" + "      \"type\": \"Feature\",\n" + "      \"geometry\": {\n"
-								+ "        \"type\": \"Point\",\n" + "        \"coordinates\": [%.5f, %.5f]\n" + "      },\n"
-								+ "      \"properties\": {\n" + "        \"name\": \"%s\"\n" + "      }\n" + "    },",
-						node.getLongitude(), node.getLatitude(), node.getId() + ""));
-			}
-
-			for (TourEdge edge : edges) {
-				sb.append("{\n" + "      \"type\": \"Feature\",\n" + "      \"geometry\": {\n"
-						+ "        \"type\": \"LineString\",\n" + "        \"coordinates\": [");
-				sb.append(String.format("[%.5f, %.5f],", edge.getFrom().getLongitude(), edge.getFrom().getLatitude()));
-				sb.append(String.format("[%.5f, %.5f]]", edge.getTo().getLongitude(), edge.getTo().getLatitude()));
-				sb.append("},\n");
-				sb.append(String.format("\"properties\": {\n" + "        \"name\": \"%s\"\n" + "      }\n" + "    },",
-						edge.getCost()));
-			}
-
-			c.print(sb.substring(0, sb.length() - 1));
-			c.print("]\n" + "}");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public static Feature nodeToFeature(TourNode node){

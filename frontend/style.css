@@ -7,6 +7,12 @@ body {
   		-webkit-font-smoothing: antialiased;
 	}
 
+  img {
+  margin: 6px;
+  margin-right: 12px;
+  height: 4vh;
+}
+
 	.marker {
   		background-image: url('marker.png');
   		background-size: cover;

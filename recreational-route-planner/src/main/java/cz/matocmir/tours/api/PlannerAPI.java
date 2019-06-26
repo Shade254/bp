@@ -2,17 +2,13 @@ package cz.matocmir.tours.api;
 
 import com.umotional.basestructures.BoundingBox;
 import cz.matocmir.tours.PlannerService;
-import cz.matocmir.tours.model.TourEdge;
-import cz.matocmir.tours.model.TourNode;
 import cz.matocmir.tours.model.TourRequest;
 import cz.matocmir.tours.model.TourResponse;
-import cz.matocmir.tours.utils.IOUtils;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
 
 /***
  * Class wraping exposed REST API, individual enpoints of the API and its parameters are described in the project paper Chapter 5
@@ -47,6 +43,25 @@ public class PlannerAPI {
 		if (result == null || result.getTours().length == 0) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
+
+//		File dir = new File("./result" + Path2DistanceRatioFilter.counter);
+//		try {
+//			for(int i = 0;i<result.getTours().length;i++){
+//				System.out.println("Output " + i);
+//				String e = IOUtils.visualizeEdges(result.getTours()[i].getOriginalEdges());
+//				BufferedWriter br = new BufferedWriter(new FileWriter(dir.getName() + File.separator + "tour" + i + ".json"));
+//				br.write(e);
+//				br.flush();
+//				br.close();
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//
+//		Arrays.stream(result.getTours()).forEach(t -> {
+//
+//		});
+//
 
 		return Response.status(200).entity(result).build();
 	}
@@ -103,20 +118,5 @@ public class PlannerAPI {
 						+ "      [%.5f, %.5f],\n" + "        [%.5f, %.5f]\n" + "      ]\n" + "    ]\n" + "  }\n" + "}";
 		return String.format(template, bb.getMinLon(), bb.getMaxLat(), bb.getMinLon(), bb.getMinLat(), bb.getMaxLon(),
 				bb.getMinLat(), bb.getMaxLon(), bb.getMaxLat(), bb.getMinLon(), bb.getMaxLat());
-	}
-
-	private String toursToGeojson(List<List<TourEdge>> edges, List<TourNode> turningPoints) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("[");
-		for (int i = 0; i < edges.size(); i++) {
-			String edgesVis = IOUtils.visualizeEdges(edges.get(i));
-			int end = edgesVis.lastIndexOf("]");
-			edgesVis = edgesVis.substring(0, end);
-			edgesVis += ", " + IOUtils.nodeToFeatureString(turningPoints.get(i));
-			edgesVis += "]\n" + "}";
-			sb.append(edgesVis);
-			sb.append(",");
-		}
-		return sb.substring(0, sb.length() - 1) + "]";
 	}
 }

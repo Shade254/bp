@@ -31,22 +31,28 @@ public class ExperimentMain {
 			}
 		}
 
-		PlannerService service = new PlannerService(path);
+		PlannerService service = new PlannerService(path, 2065);
 
 		String choice = null;
 		while(choice == null) {
 			System.out.print("Enter experiment to run (c - Candidate, l - Length, f - Factor, s - Strictness)\n>");
 			choice = sc.nextLine();
-			if(choice.equals("c")){
+			switch (choice) {
+			case "c":
 				candsTest(service);
-			} else if(choice.equals("l")){
+				break;
+			case "l":
 				lengthTest(service);
-			} else if(choice.equals("f")){
+				break;
+			case "f":
 				factorTest(service);
-			} else if(choice.equals("r")){
+				break;
+			case "r":
 				strictnessTest(service);
-			} else{
+				break;
+			default:
 				System.out.println("Not a valid choice");
+				break;
 			}
 
 

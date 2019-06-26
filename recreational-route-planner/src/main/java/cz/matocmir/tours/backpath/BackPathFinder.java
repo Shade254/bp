@@ -43,10 +43,8 @@ public class BackPathFinder {
 
 		List<TourEdge> completePath = new ArrayList<>(forwardPath);
 		completePath.addAll(bp.getExactPath());
-		double totalCost = forwardPath.stream().mapToDouble(TourEdge::getCost).sum() + bp.getLastLabelObjId()
-				.getCandidate().weight;
 
-		return new Tour(completePath, cand.correspNode.getNode(), cand.correspNode.getNode(), totalCost);
+		return new Tour(completePath, cand.correspNode.getNode(), cand.correspNode.getNode());
 	}
 
 
@@ -72,7 +70,7 @@ public class BackPathFinder {
 			forwardLength += nextEdge.getLengthInMeters();
 			forwardCost += nextEdge.getCost();
 
-			if (TourUtils.computeGreatCircleDistance(startingNode, forwardPath.get(i).getNode())
+			if (TourUtils.computeEuclideanDistance(startingNode, forwardPath.get(i).getNode())
 					< request.getMinLength() / 2 * beta) {
 				continue;
 			}
@@ -96,7 +94,7 @@ public class BackPathFinder {
 		}
 
 		if (bestPath != null) {
-			response = new Tour(bestPath, candidate.correspNode.getNode(), bestUsed, bestScore);
+			response = new Tour(bestPath, candidate.correspNode.getNode(), bestUsed);
 		}
 
 		return response;
@@ -162,7 +160,7 @@ public class BackPathFinder {
 
 			TourNode turnP = forwardPath.get(i).getNode();
 
-			if (TourUtils.computeGreatCircleDistance(graph.getNode(request.getStartNode()), turnP)
+			if (TourUtils.computeEuclideanDistance(graph.getNode(request.getStartNode()), turnP)
 					< request.getMinLength() / 2 * beta) {
 				continue;
 			}
@@ -190,7 +188,7 @@ public class BackPathFinder {
 			}
 		}
 		if (bestPath != null) {
-			response = new Tour(bestPath, lastTurningPoint.correspNode.getNode(), bestTurningPoint, bestScore);
+			response = new Tour(bestPath, lastTurningPoint.correspNode.getNode(), bestTurningPoint);
 		}
 
 		return response;

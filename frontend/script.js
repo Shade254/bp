@@ -1,5 +1,5 @@
-//var address = 'http://localhost:8080';
-var address = 'http://test.umotional.net/tour-planner';
+var address = 'http://localhost:8080';
+//var address = 'http://test.umotional.net/tour-planner';
 
 	// flag of choosed planning mode(closed, p2p)
 	var which;
@@ -14,6 +14,8 @@ var address = 'http://test.umotional.net/tour-planner';
 	var markerFrom;
   	var markerTo;
 
+  	var data;
+
   	mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhZGUyNTQiLCJhIjoiY2p0Ym44b3diMG1hczQzcDhlMWhiM203OCJ9.5aB7eFT6mMTBGqt_7QSr-A';
 
   	var map = new mapboxgl.Map({
@@ -25,7 +27,13 @@ var address = 'http://test.umotional.net/tour-planner';
 
   	document.getElementById("closedTourButton").click();
 	document.getElementById("loader").style.display="none";
-	document.getElementById("select-based-flipswitch").value="second";
+	//document.getElementById("select-based-flipswitch").value="second";
+
+	function selectTour(idx){
+		map.getSource('closedwalk').setData(data.tours[idx].path)
+		map.getSource('usedpoint').setData(data.tours[idx].turningPointPlanned)
+		map.getSource('lastpoint').setData(data.tours[idx].turningPointLast)
+	}
 
   	// switching tabs
 	function openTab(evt, tourName) {
@@ -76,6 +84,13 @@ var address = 'http://test.umotional.net/tour-planner';
 	// load empty sources and layer styles to the map - ready for data to be filled in
  	// also loads borders of the graph from the server 
 	map.on("load", function() {
+		
+
+		map.addSource("alltours", {"type":"geojson", "data":{
+  			"type": "FeatureCollection",
+  			"features": []
+		}});
+
 		map.addSource("closedwalk", {"type":"geojson", "data":{
   			"type": "FeatureCollection",
   			"features": []
@@ -90,7 +105,23 @@ var address = 'http://test.umotional.net/tour-planner';
   			"type": "FeatureCollection",
   			"features": []
 		}});
-	
+
+		map.addLayer({
+			"id": "tours1",
+			"type": "line",
+			"source": "alltours",
+			"layout": {
+				"line-join": "round",
+				"line-cap": "round"
+			},
+			"paint": {
+				"line-color": "#A9A9A9",
+				"line-width": 5
+			},
+			"filter": ["==", "$type", "LineString"],
+		});
+
+
 		map.addLayer({
 			"id": "tours",
 			"type": "line",
@@ -100,8 +131,8 @@ var address = 'http://test.umotional.net/tour-planner';
 				"line-cap": "round"
 			},
 			"paint": {
-				"line-color": "#FF0000",
-				"line-width": 7
+				"line-color": "#556B2F",
+				"line-width": 9
 			},
 			"filter": ["==", "$type", "LineString"],
 		});
@@ -173,40 +204,59 @@ var address = 'http://test.umotional.net/tour-planner';
 		button.value = 'Submit';
 
 		if(request.status == 200){
-			var data = JSON.parse(this.response)
+			data = JSON.parse(this.response)
 			console.log(data);
 
-			var select = document.getElementById("routes");
+			var display = document.getElementById("routes1");
 
-    		for(var i = select.options.length - 1 ; i >= 0 ; i--){
-        		select.remove(i);
+			document.getElementById("timeInfo").innerHTML = "Response time - " + data.responseTime + " ms";
+
+    		for(var i = display.getElementsByTagName("li").length - 1 ; i >= 0 ; i--){
+        		display.removeChild(display.getElementsByTagName("li")[i]);
     		}
+
+    		var bestTours = 8;
+    		data.tours = data.tours.slice(0, bestTours);
+
+
+    		var allFeatures = [];
 
     		for(var i = data.tours.length; i>0 ; --i) {
-        		var option = document.createElement('option');
-        		option.value = i;
-        		option.text = "Tour number " + i;
-        		select.add(option, 0);
+        		var href = document.createElement("a");
+        		href.setAttribute("href", "#");
+        		href.setAttribute("class", "ui-btn ui-btn-icon-right ui-icon-carat-r");
+        		href.setAttribute("onclick", "selectTour(" + (data.tours.length-i) + ")");
+        		var option = document.createElement("li");
+        		var tourH = document.createElement("h2");
+        		var par = document.createElement("p");
+        		
+        		var text = document.createTextNode("Tour number " + (data.tours.length-i));
+				tourH.appendChild(text);
+        		
+        		var kmLength = (data.tours[data.tours.length-i].length/1000).toFixed(2);
+        		var round = parseFloat(data.tours[data.tours.length-i].roundness).toFixed(4);
+        		var meanCost = ((data.tours[data.tours.length-i].totalCost)/data.tours[data.tours.length-i].length).toFixed(4);
+        		text = document.createTextNode("L: " +kmLength+" km, R: " + round + ", C: " + meanCost);
+
+        		par.appendChild(text);
+
+        		href.appendChild(tourH);
+        		href.appendChild(par);
+        		option.appendChild(href);
+        		display.appendChild(option);
+        		allFeatures.push.apply(allFeatures,data.tours[data.tours.length-i].path.features);
     		}
-			document.getElementById("timeInfo").innerHTML = "Response time - " + data.responseTime + " ms";
+
+			var collection = {
+    			features: allFeatures,
+    			type: 'FeatureCollection'
+			};
+    		map.getSource("alltours").setData(collection);
+
 
 			map.getSource('closedwalk').setData(data.tours[0].path)
 			map.getSource('usedpoint').setData(data.tours[0].turningPointPlanned)
 			map.getSource('lastpoint').setData(data.tours[0].turningPointLast)
-			document.getElementById("lengthInfo").innerHTML = "Length - " + data.tours[0].length + " m";
-			document.getElementById("roundnessInfo").innerHTML = "Roundness - " + parseFloat(data.tours[0].roundness).toFixed(5);
-			document.getElementById("totalInfo").innerHTML = "Total cost - " + data.tours[0].totalCost;
-			select.value = select.options[0];
-			
-			select.onchange=function(e){
-				map.getSource('closedwalk').setData(data.tours[parseInt(e.target.value)-1].path)
-				map.getSource('usedpoint').setData(data.tours[parseInt(e.target.value)-1].turningPointPlanned)
-				map.getSource('lastpoint').setData(data.tours[parseInt(e.target.value)-1].turningPointLast)
-				document.getElementById("lengthInfo").innerHTML = "Length - " + data.tours[parseInt(e.target.value)-1].length + " m";
-				document.getElementById("roundnessInfo").innerHTML = "Roundness - " + parseFloat(data.tours[parseInt(e.target.value)-1].roundness).toFixed(5);
-				document.getElementById("totalInfo").innerHTML = "Total cost - " + data.tours[parseInt(e.target.value)-1].totalCost;
-
-			}
 		} else {
 			console.log(this.response)
 			alert("Not found, try again")
@@ -295,10 +345,15 @@ var address = 'http://test.umotional.net/tour-planner';
 
 			minL = parseInt(document.getElementById("length-min").value)
 			maxL = parseInt(document.getElementById("length-max").value)
-			strict = parseFloat(document.getElementById("strictInput").value)
-			tours = parseInt(document.getElementById("numInput").value)
-			factor = parseInt(document.getElementById("factorInput").value)
-			method=document.getElementById("select-based-flipswitch").value
+			//strict = parseFloat(document.getElementById("strictInput").value)
+			//tours = parseInt(document.getElementById("numInput").value)
+			//factor = parseInt(document.getElementById("factorInput").value)
+			//method=document.getElementById("select-based-flipswitch").value
+			factor = 600;
+			strict = 0.8;
+			method = "second";
+			tours = 20;
+
 
 
 			var url;
@@ -320,6 +375,7 @@ var address = 'http://test.umotional.net/tour-planner';
 			if(!isNaN(tours)){
 				url = url + '&tours=' + tours
 			}
+
 			
 			if(method == "first"){
 				url = url + '&method=' + 'false'

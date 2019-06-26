@@ -1,8 +1,8 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2019.1.24)  24 MAY 2019 10:09
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2019.1.24)  9 JUN 2019 17:16
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**matocmirBP.tex
+**./matocmirBP.tex
 (./matocmirBP.tex
 LaTeX2e <2018-04-01> patch level 2
 Babel <3.18> and hyphenation patterns for 84 language(s) loaded.
@@ -1371,26 +1371,26 @@ ass ctuthesis
 .................................................
 . LaTeX info: "xparse/define-command"
 . 
-. Defining command \codeword with sig. 'v' on line 60.
+. Defining command \codeword with sig. 'v' on line 66.
 .................................................
  (./matocmirBP.aux)
 \openout1 = `matocmirBP.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 65.
-LaTeX Font Info:    ... okay on input line 65.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 65.
-LaTeX Font Info:    ... okay on input line 65.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 65.
-LaTeX Font Info:    ... okay on input line 65.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 65.
-LaTeX Font Info:    ... okay on input line 65.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 65.
-LaTeX Font Info:    ... okay on input line 65.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 65.
-LaTeX Font Info:    ... okay on input line 65.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 65.
-LaTeX Font Info:    ... okay on input line 65.
-LaTeX Font Info:    Try loading font information for T1+lmr on input line 65.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 71.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 71.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 71.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 71.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 71.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 71.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 71.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Try loading font information for T1+lmr on input line 71.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
@@ -1515,7 +1515,7 @@ Dictionary: translator-basic-dictionary, Language: English
 (/usr/local/texlive/2018/texmf-dist/tex/latex/siunitx/siunitx-abbreviations.cfg
 File: siunitx-abbreviations.cfg 2017/11/26 v2.7k siunitx: Abbreviated units
 )
-LaTeX Info: Redefining \microtypecontext on input line 65.
+LaTeX Info: Redefining \microtypecontext on input line 71.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -1574,7 +1574,7 @@ Package pdflscape Info: Auto-detected driver: pdftex on input line 81.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring OFF on input line 65.
+Package hyperref Info: Link coloring OFF on input line 71.
 (/usr/local/texlive/2018/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
 
@@ -1583,43 +1583,43 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
 \c@section@level=\count371
 )
-LaTeX Info: Redefining \ref on input line 65.
-LaTeX Info: Redefining \pageref on input line 65.
-LaTeX Info: Redefining \nameref on input line 65.
+LaTeX Info: Redefining \ref on input line 71.
+LaTeX Info: Redefining \pageref on input line 71.
+LaTeX Info: Redefining \nameref on input line 71.
 
 (./matocmirBP.out) (./matocmirBP.out)
 \@outlinefile=\write4
 \openout4 = `matocmirBP.out'.
 
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 65.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 71.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OML+lmm on input line 65.
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 71.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 65.
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 71.
 
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMX+lmex on input line 65.
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 71.
 
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 65.
+(Font)              <10.95> on input line 71.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 65.
+(Font)              <8> on input line 71.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 65.
-LaTeX Font Info:    Try loading font information for U+msa on input line 65.
+(Font)              <6> on input line 71.
+LaTeX Font Info:    Try loading font information for U+msa on input line 71.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
@@ -1627,7 +1627,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 (/usr/local/texlive/2018/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 65.
+LaTeX Font Info:    Try loading font information for U+msb on input line 71.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
@@ -1635,7 +1635,7 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 (/usr/local/texlive/2018/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
-LaTeX Font Info:    Try loading font information for OT1+lmss on input line 65.
+LaTeX Font Info:    Try loading font information for OT1+lmss on input line 71.
 
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/lm/ot1lmss.fd
@@ -1645,7 +1645,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmss' (encoding: OT1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 65.
+LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 71.
 
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/lm/ot1lmtt.fd
@@ -1662,16 +1662,16 @@ Package microtype Info: Loading generic protrusion settings for font family
 <ctu_logo_black.pdf, id=176, 366.36874pt x 279.0425pt>
 File: ctu_logo_black.pdf Graphic file (type pdf)
 <use ctu_logo_black.pdf>
-Package pdftex.def Info: ctu_logo_black.pdf  used on input line 66.
+Package pdftex.def Info: ctu_logo_black.pdf  used on input line 72.
 (pdftex.def)             Requested size: 85.86746pt x 65.40001pt.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <14.4> on input line 66.
+(Font)              <14.4> on input line 72.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 66.
+(Font)              <10> on input line 72.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 66.
+(Font)              <7> on input line 72.
 
-Overfull \hbox (5.0pt too wide) in paragraph at lines 66--66
+Overfull \hbox (5.0pt too wide) in paragraph at lines 72--72
 []|| [][][] 
  []
 
@@ -1697,7 +1697,7 @@ Non-PDF special ignored!
 
 {/usr/local/texlive/2018/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./ctu_l
 ogo_black.pdf>]
-LaTeX Font Info:    Try loading font information for T1+lmtt on input line 66.
+LaTeX Font Info:    Try loading font information for T1+lmtt on input line 72.
  (/usr/local/texlive/2018/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
@@ -1745,22 +1745,22 @@ Package microtype Info: Loading generic protrusion settings for font family
 .................................................
 . LaTeX info: "xparse/redefine-command"
 . 
-. Redefining command \chapter with sig. 'som' on line 66.
+. Redefining command \chapter with sig. 'som' on line 72.
 .................................................
 .................................................
 . LaTeX info: "xparse/redefine-command"
 . 
-. Redefining command \tableofcontents with sig. '' on line 66.
+. Redefining command \tableofcontents with sig. '' on line 72.
 .................................................
 .................................................
 . LaTeX info: "xparse/redefine-command"
 . 
-. Redefining command \listoffigures with sig. '' on line 66.
+. Redefining command \listoffigures with sig. '' on line 72.
 .................................................
 .................................................
 . LaTeX info: "xparse/redefine-command"
 . 
-. Redefining command \listoftables with sig. '' on line 66.
+. Redefining command \listoftables with sig. '' on line 72.
 .................................................
  [3
 
@@ -1828,7 +1828,7 @@ Chapter 1.
 
 ]
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 80.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 86.
  [2] [3] [4
 
 ]
@@ -1843,35 +1843,35 @@ Underfull \vbox (badness 6559) has occurred while \output is active []
 Chapter 3.
 [11] [12]
 Chapter 4.
-<displacement.pdf, id=373, 165.7392pt x 171.76169pt>
+<displacement.pdf, id=374, 165.7392pt x 171.76169pt>
 File: displacement.pdf Graphic file (type pdf)
 <use displacement.pdf>
-Package pdftex.def Info: displacement.pdf  used on input line 178.
+Package pdftex.def Info: displacement.pdf  used on input line 184.
 (pdftex.def)             Requested size: 145.19778pt x 150.47717pt.
 [13
 
 ] [14 <./displacement.pdf>]
-<pseudocode.png, id=404, 1240.635pt x 892.33376pt>
+<pseudocode.png, id=405, 1240.635pt x 892.33376pt>
 File: pseudocode.png Graphic file (type png)
 <use pseudocode.png>
-Package pdftex.def Info: pseudocode.png  used on input line 237.
+Package pdftex.def Info: pseudocode.png  used on input line 243.
 (pdftex.def)             Requested size: 326.69778pt x 234.96957pt.
  [15 <./pseudocode.png>] [16] [17] [18]
-<deadEnds.pdf, id=436, 166.7028pt x 194.6472pt>
+<deadEnds.pdf, id=437, 166.7028pt x 194.6472pt>
 File: deadEnds.pdf Graphic file (type pdf)
 <use deadEnds.pdf>
-Package pdftex.def Info: deadEnds.pdf  used on input line 350.
+Package pdftex.def Info: deadEnds.pdf  used on input line 356.
 (pdftex.def)             Requested size: 145.19778pt x 169.54959pt.
-<contracted.pdf, id=437, 153.6942pt x 110.3322pt>
+<contracted.pdf, id=438, 153.6942pt x 110.3322pt>
 File: contracted.pdf Graphic file (type pdf)
 <use contracted.pdf>
-Package pdftex.def Info: contracted.pdf  used on input line 352.
+Package pdftex.def Info: contracted.pdf  used on input line 358.
 (pdftex.def)             Requested size: 145.19778pt x 104.23584pt.
  [19]
-<return.png, id=446, 983.675pt x 847.165pt>
+<return.png, id=447, 983.675pt x 847.165pt>
 File: return.png Graphic file (type png)
 <use return.png>
-Package pdftex.def Info: return.png  used on input line 361.
+Package pdftex.def Info: return.png  used on input line 367.
 (pdftex.def)             Requested size: 254.09889pt x 218.83577pt.
 
 [20 <./deadEnds.pdf
@@ -1884,44 +1884,44 @@ pdfTeX warning: pdflatex (file ./contracted.pdf): PDF inclusion: invalid other
 resource which is no dict (key 'ProcSets', type <array>); ignored.
 >] [21 <./return.png>] [22]
 Chapter 5.
-<graph.png, id=480, 1060.96375pt x 898.35625pt>
+<graph.png, id=481, 1060.96375pt x 898.35625pt>
 File: graph.png Graphic file (type png)
 <use graph.png>
-Package pdftex.def Info: graph.png  used on input line 383.
+Package pdftex.def Info: graph.png  used on input line 389.
 (pdftex.def)             Requested size: 290.40111pt x 245.89041pt.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <9> on input line 388.
+(Font)              <9> on input line 394.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 388.
+(Font)              <5> on input line 394.
 [23
 
 ]
-<search.png, id=498, 1104.125pt x 1218.5525pt>
+<search.png, id=499, 1104.125pt x 1218.5525pt>
 File: search.png Graphic file (type png)
 <use search.png>
-Package pdftex.def Info: search.png  used on input line 394.
+Package pdftex.def Info: search.png  used on input line 400.
 (pdftex.def)             Requested size: 217.80222pt x 240.35933pt.
  [24 <./graph.png>]
-<service.png, id=511, 1542.76375pt x 892.33376pt>
+<service.png, id=512, 1542.76375pt x 892.33376pt>
 File: service.png Graphic file (type png)
 <use service.png>
-Package pdftex.def Info: service.png  used on input line 404.
+Package pdftex.def Info: service.png  used on input line 410.
 (pdftex.def)             Requested size: 290.40111pt x 167.96573pt.
  [25 <./search.png>]
-<communication.pdf, id=523, 916.38356pt x 192.72pt>
+<communication.pdf, id=524, 916.38356pt x 192.72pt>
 File: communication.pdf Graphic file (type pdf)
 <use communication.pdf>
-Package pdftex.def Info: communication.pdf  used on input line 422.
+Package pdftex.def Info: communication.pdf  used on input line 428.
 (pdftex.def)             Requested size: 326.69778pt x 68.70572pt.
 
-Overfull \hbox (11.2pt too wide) in paragraph at lines 433--446
+Overfull \hbox (11.2pt too wide) in paragraph at lines 439--452
 [][] 
  []
 
-<api.png, id=526, 482.80376pt x 298.11375pt>
+<api.png, id=527, 482.80376pt x 298.11375pt>
 File: api.png Graphic file (type png)
 <use api.png>
-Package pdftex.def Info: api.png  used on input line 451.
+Package pdftex.def Info: api.png  used on input line 457.
 (pdftex.def)             Requested size: 254.09889pt x 156.89417pt.
 
 Underfull \vbox (badness 1097) has occurred while \output is active []
@@ -1931,20 +1931,20 @@ Underfull \vbox (badness 1097) has occurred while \output is active []
 pdfTeX warning: pdflatex (file ./communication.pdf): PDF inclusion: invalid oth
 er resource which is no dict (key 'ProcSets', type <array>); ignored.
 >] [27 <./api.png>]
-Overfull \hbox (11.2pt too wide) in paragraph at lines 462--469
+Overfull \hbox (11.2pt too wide) in paragraph at lines 468--475
 [][] 
  []
 
-<UI.png, id=562, 1927.2pt x 1062.97125pt>
+<UI.png, id=563, 1927.2pt x 1062.97125pt>
 File: UI.png Graphic file (type png)
 <use UI.png>
-Package pdftex.def Info: UI.png  used on input line 483.
+Package pdftex.def Info: UI.png  used on input line 489.
 (pdftex.def)             Requested size: 326.69778pt x 180.18369pt.
 [28]
-<plannedTour.png, id=569, 1055.945pt x 851.18pt>
+<plannedTour.png, id=570, 1055.945pt x 851.18pt>
 File: plannedTour.png Graphic file (type png)
 <use plannedTour.png>
-Package pdftex.def Info: plannedTour.png  used on input line 493.
+Package pdftex.def Info: plannedTour.png  used on input line 499.
 (pdftex.def)             Requested size: 326.69778pt x 263.34355pt.
  [29 <./UI.png>] [30 <./plannedTour.png>]
 Chapter 6.
@@ -1954,94 +1954,94 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [31
 
 ]
-<candsBest.png, id=595, 547.8066pt x 355.0866pt>
+<candsBest.png, id=596, 547.8066pt x 355.0866pt>
 File: candsBest.png Graphic file (type png)
 <use candsBest.png>
-Package pdftex.def Info: candsBest.png  used on input line 531.
+Package pdftex.def Info: candsBest.png  used on input line 537.
 (pdftex.def)             Requested size: 326.69778pt x 211.76947pt.
 
 [32 <./candsBest.png>]
-<candsTime.png, id=605, 572.8602pt x 343.0416pt>
+<candsTime.png, id=606, 572.8602pt x 343.0416pt>
 File: candsTime.png Graphic file (type png)
 <use candsTime.png>
-Package pdftex.def Info: candsTime.png  used on input line 544.
+Package pdftex.def Info: candsTime.png  used on input line 550.
 (pdftex.def)             Requested size: 326.69778pt x 195.63518pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [33]
-<lengthBest.png, id=612, 519.8622pt x 313.17pt>
+<lengthBest.png, id=613, 519.8622pt x 313.17pt>
 File: lengthBest.png Graphic file (type png)
 <use lengthBest.png>
-Package pdftex.def Info: lengthBest.png  used on input line 575.
+Package pdftex.def Info: lengthBest.png  used on input line 581.
 (pdftex.def)             Requested size: 326.69778pt x 196.81071pt.
-<lengthTime.png, id=613, 514.5624pt x 308.8338pt>
+<lengthTime.png, id=614, 514.5624pt x 308.8338pt>
 File: lengthTime.png Graphic file (type png)
 <use lengthTime.png>
-Package pdftex.def Info: lengthTime.png  used on input line 581.
+Package pdftex.def Info: lengthTime.png  used on input line 587.
 (pdftex.def)             Requested size: 326.69778pt x 196.08842pt.
 
 [34 <./candsTime.png>]
 Underfull \vbox (badness 1259) has occurred while \output is active []
 
  [35 <./lengthBest.png>] [36 <./lengthTime.png>]
-<factorBest.png, id=633, 596.9502pt x 414.348pt>
+<factorBest.png, id=634, 596.9502pt x 414.348pt>
 File: factorBest.png Graphic file (type png)
 <use factorBest.png>
-Package pdftex.def Info: factorBest.png  used on input line 616.
+Package pdftex.def Info: factorBest.png  used on input line 622.
 (pdftex.def)             Requested size: 326.69778pt x 226.76671pt.
-<strictBest.png, id=635, 544.9158pt x 323.7696pt>
+<strictBest.png, id=636, 544.9158pt x 323.7696pt>
 File: strictBest.png Graphic file (type png)
 <use strictBest.png>
-Package pdftex.def Info: strictBest.png  used on input line 631.
+Package pdftex.def Info: strictBest.png  used on input line 637.
 (pdftex.def)             Requested size: 326.69778pt x 194.11505pt.
  [37 <./factorBest.png>] [38 <./strictBest.png>]
 Chapter 7.
 [39
 
 ] [40]
-Underfull \hbox (badness 10000) in paragraph at lines 641--642
+Underfull \hbox (badness 10000) in paragraph at lines 647--648
 []\T1/lmr/m/n/10.95 (+20) GOV.UK. (2019). Gov-ern-ment pub-lishes ¿1.2 bil-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 641--642
+Underfull \hbox (badness 10000) in paragraph at lines 647--648
 \T1/lmr/m/n/10.95 (+20) lion plan to in-crease cy-cling and walk-ing. [on-line]
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 641--642
+Underfull \hbox (badness 10000) in paragraph at lines 647--648
 \T1/lmr/m/n/10.95 (+20) Avail-able at: []$\T1/lmtt/m/n/10.95 https : / / www . 
 gov . uk / government / news /
  []
 
 
-Overfull \hbox (49.97215pt too wide) in paragraph at lines 641--642
+Overfull \hbox (49.97215pt too wide) in paragraph at lines 647--648
 \T1/lmtt/m/n/10.95 government-[]publishes-[]12-[]billion-[]plan-[]to-[]increase
 -[]cycling-[]and-[]walking$[]
  []
 
 
-Underfull \hbox (badness 5696) in paragraph at lines 642--643
+Underfull \hbox (badness 5696) in paragraph at lines 648--649
 []\T1/lmr/m/n/10.95 (+20) Mobility and Trans-port - Eu-ro-pean Com-mis-sion. (2
 019). Cy-
  []
 
 
-Underfull \hbox (badness 4518) in paragraph at lines 642--643
+Underfull \hbox (badness 4518) in paragraph at lines 648--649
 \T1/lmr/m/n/10.95 (+20) cling - Mo-bil-ity and Trans-port - Eu-ro-pean Com-mis-
 sion. [on-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 642--643
+Underfull \hbox (badness 10000) in paragraph at lines 648--649
 \T1/lmr/m/n/10.95 (+20) line] Avail-able at: []$\T1/lmtt/m/n/10.95 https : / / 
 ec . europa . eu / transport / themes /
  []
 
 
-Underfull \hbox (badness 1436) in paragraph at lines 642--643
+Underfull \hbox (badness 1436) in paragraph at lines 648--649
 \T1/lmtt/m/n/10.95 clean-[]transport-[]urban-[]transport / cycling _ en$[] \T1/
 lmr/m/n/10.95 (+20) [Ac-cessed 24 May
  []
@@ -2049,24 +2049,24 @@ lmr/m/n/10.95 (+20) [Ac-cessed 24 May
 [41
 
 ]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 655.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 661.
  [42]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 655.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 661.
  (./matocmirBP.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 655.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 655.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 661.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 661.
 Package rerunfilecheck Info: File `matocmirBP.out' has not changed.
 (rerunfilecheck)             Checksum: F8EA230BF5BD127F8D592998620893C2;2871.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 655.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 661.
  ) 
 Here is how much of TeX's memory you used:
- 32692 strings out of 492649
- 607551 string characters out of 6129622
- 725504 words of memory out of 5000000
+ 32693 strings out of 492649
+ 607567 string characters out of 6129622
+ 725566 words of memory out of 5000000
  35781 multiletter control sequences out of 15000+600000
  660073 words of font info for 184 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 44i,17n,87p,10373b,1222s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 44i,17n,87p,10375b,1222s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2018/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/
 texlive/2018/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/local/texlive/20
 18/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2018/texmf-d
@@ -2087,10 +2087,10 @@ xlive/2018/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2018
 1/public/lm/lmtt10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/l
 m/lmtt9.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/sym
 bols/msbm10.pfb>
-Output written on matocmirBP.pdf (48 pages, 3091626 bytes).
+Output written on matocmirBP.pdf (48 pages, 3092078 bytes).
 PDF statistics:
- 779 PDF objects out of 1000 (max. 8388607)
- 662 compressed objects within 7 object streams
- 154 named destinations out of 1000 (max. 500000)
+ 780 PDF objects out of 1000 (max. 8388607)
+ 663 compressed objects within 7 object streams
+ 155 named destinations out of 1000 (max. 500000)
  46008 words of extra memory for PDF output out of 51595 (max. 10000000)
 

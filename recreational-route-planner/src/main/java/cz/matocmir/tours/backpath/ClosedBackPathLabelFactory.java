@@ -44,7 +44,7 @@ public class ClosedBackPathLabelFactory implements LabelFactory<BackPathLabel> {
 		List<BackPathLabel> labels = new ArrayList<>();
 
 		double tourL = current.getCandidate().length + forwardLength + TourUtils
-				.computeGreatCircleDistance(startNode, curCan.correspNode.getNode());
+				.computeEuclideanDistance(startNode, curCan.correspNode.getNode());
 
 		if (tourL >= maxLength + epsilon) {
 			return Collections.emptyList();
@@ -52,7 +52,7 @@ public class ClosedBackPathLabelFactory implements LabelFactory<BackPathLabel> {
 
 		for (TourEdge e : outEdges) {
 			double weight = countWeight(e, curCan.length);
-			Candidate nxtCan = new Candidate(new TreeNode(e, curCan.correspNode, e.getTo()), curCan.weight + weight,
+			Candidate nxtCan = new Candidate(new TreeNode(e, curCan.correspNode, graph.getNode(e.getToId())), curCan.weight + weight,
 					curCan.length + e.getLengthInMeters());
 			BackPathLabel label = new BackPathLabel(e.getToId(), new int[] { (int) nxtCan.weight }, current, nxtCan);
 			labels.add(label);

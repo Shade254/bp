@@ -1,42 +1,57 @@
 package cz.matocmir.tours.model;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.umotional.basestructures.GraphStructure;
-import jersey.repackaged.com.google.common.collect.HashBasedTable;
+import com.umotional.geotools.Transformer;
+import com.vividsolutions.jts.geom.Coordinate;
+import cz.matocmir.tours.utils.SerializableTourGraph;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TourGraph implements GraphStructure<TourNode, TourEdge>, Serializable {
 	private static final Logger log = Logger.getLogger(TourGraph.class);
-	private HashMap<Integer, TourNode> nodes = new HashMap<>();
-	private HashMap<EdgeId, TourEdge> edges = new HashMap<>();
-	private HashMap<Integer, List<TourEdge>> outgoingEdges = new HashMap<>();
-	private HashMap<Integer, List<TourEdge>> incomingEdges = new HashMap<>();
+	private TIntObjectMap<TourNode> nodes;
+	private Map<EdgeId, TourEdge> edges;
+	private TIntObjectMap<Collection<TourEdge>> outgoingEdges;
+	private TIntObjectMap<Collection<TourEdge>> incomingEdges;
 
-	public TourGraph() {
+
+	public TourGraph(){
+		init();
+	}
+
+	public TourGraph(SerializableTourGraph serializableTourGraph) {
+		init();
+		System.out.println("Kryo loaded ...");
+
+		for(TourNode m : serializableTourGraph.getNodes()){
+			addNode(m);
+		}
+
+		for(TourEdge f : serializableTourGraph.getEdges()) {
+			addEdge(f);
+		}
+
+		System.out.println("Edges added");
+	}
+	private void init(){
+		nodes = new TIntObjectHashMap<>();
+		edges = new HashMap<>();
+		outgoingEdges = new TIntObjectHashMap<>();
+		incomingEdges = new TIntObjectHashMap<>();
 	}
 
 	public void addEdge(TourEdge edge) {
 		int from = edge.getFromId(), to = edge.getToId();
 
-		if (!this.containsNode(edge.getFrom())) {
-			this.addNode(edge.getFrom());
-		}
-
-		if (!this.containsNode(edge.getTo())) {
-			this.addNode(edge.getTo());
-		}
+		assert nodes.get(from) != null
+				&& nodes.get(to) != null : "Node has to be in graph builder before inserting edge";
 
 		edges.put(new EdgeId(from, to), edge);
 
@@ -45,11 +60,12 @@ public class TourGraph implements GraphStructure<TourNode, TourEdge>, Serializab
 	}
 
 	public void addNode(TourNode node) {
-		if (!this.containsNode(node.getId())) {
-			nodes.put(node.getId(), node);
-			outgoingEdges.putIfAbsent(node.getId(), new ArrayList<>());
-			incomingEdges.putIfAbsent(node.getId(), new ArrayList<>());
-		}
+		assert !this.containsNode(node.getId()) : "Graph already contains node with same ID(" + node.getId() + ")" ;
+
+		nodes.put(node.getId(), node);
+		outgoingEdges.put(node.getId(), new ArrayList<>(4));
+		incomingEdges.put(node.getId(), new ArrayList<>(4));
+
 	}
 
 	@Override
@@ -84,12 +100,12 @@ public class TourGraph implements GraphStructure<TourNode, TourEdge>, Serializab
 
 	@Override
 	public List<TourEdge> getInEdges(TourNode tourNode) {
-		return getInEdges(tourNode.getId());
+		return new ArrayList<>(getInEdges(tourNode.getId()));
 	}
 
 	@Override
 	public List<TourEdge> getInEdges(int i) {
-		return incomingEdges.get(i);
+		return incomingEdges.get(i) == null ? new ArrayList<>() : new ArrayList<>(incomingEdges.get(i));
 	}
 
 	@Override
@@ -99,12 +115,12 @@ public class TourGraph implements GraphStructure<TourNode, TourEdge>, Serializab
 
 	@Override
 	public List<TourEdge> getOutEdges(int i) {
-		return outgoingEdges.get(i) == null ? new ArrayList<>() : outgoingEdges.get(i);
+		return outgoingEdges.get(i) == null ? new ArrayList<>() : new ArrayList<>(outgoingEdges.get(i));
 	}
 
 	@Override
 	public Collection<TourNode> getAllNodes() {
-		return nodes.values();
+		return nodes.valueCollection();
 	}
 
 	@Override
@@ -112,7 +128,12 @@ public class TourGraph implements GraphStructure<TourNode, TourEdge>, Serializab
 		return edges.values();
 	}
 
-	private static class EdgeId {
+	public SerializableTourGraph getSerializableTnsGraph() {
+		return new SerializableTourGraph(nodes.valueCollection().toArray(new TourNode[nodes.size()]), edges.values().toArray(
+				new TourEdge[0]));
+	}
+
+	private static class EdgeId implements Serializable{
 		int fromNodeId;
 		int toNodeId;
 
@@ -126,10 +147,8 @@ public class TourGraph implements GraphStructure<TourNode, TourEdge>, Serializab
 
 		@Override
 		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + (fromNodeId ^ (fromNodeId >>> 32));
-			result = prime * result + (toNodeId ^ (toNodeId >>> 32));
+			int result = fromNodeId;
+			result = 31 * result + toNodeId;
 			return result;
 		}
 
@@ -153,7 +172,7 @@ public class TourGraph implements GraphStructure<TourNode, TourEdge>, Serializab
 			c.print("{\n" + "  \"type\": \"FeatureCollection\",\n" + "  \"features\": [");
 			StringBuilder sb = new StringBuilder();
 
-			for (TourNode node : nodes.values()) {
+			for (TourNode node : nodes.valueCollection()) {
 				sb.append(String.format("{\n" + "      \"type\": \"Feature\",\n" + "      \"geometry\": {\n"
 								+ "        \"type\": \"Point\",\n" + "        \"coordinates\": [%.5f, %.5f]\n" + "      },\n"
 								+ "      \"properties\": {\n" + "        \"name\": \"%s\"\n" + "      }\n" + "    },",
@@ -177,7 +196,8 @@ public class TourGraph implements GraphStructure<TourNode, TourEdge>, Serializab
 		}
 	}
 
-	public static TourGraph graphFromCSV(String graphPath) {
+	public static TourGraph graphFromCSV(String graphPath, int projection) {
+		Transformer transformer = new Transformer(projection);
 		log.info("Loading graph from " + (new File(graphPath).getAbsolutePath()));
 		TourGraph g = new TourGraph();
 		AtomicInteger counter = new AtomicInteger();
@@ -190,13 +210,24 @@ public class TourGraph implements GraphStructure<TourNode, TourEdge>, Serializab
 			final int[] percent = { 10 };
 			reader.lines().map(line -> {
 				String[] pom = line.split(";");
+				Coordinate projectedFrom = transformer
+						.toProjected(new Coordinate(Double.parseDouble(pom[4]), Double.parseDouble(pom[3])));
+
 				TourNode from = new TourNode(Double.parseDouble(pom[3]), Double.parseDouble(pom[4]),
-						Integer.parseInt(pom[0]));
+						Integer.parseInt(pom[0]), projectedFrom.y, projectedFrom.x);
+
+				Coordinate projectedTo = transformer
+						.toProjected(new Coordinate(Double.parseDouble(pom[6]), Double.parseDouble(pom[5])));
 				TourNode to = new TourNode(Double.parseDouble(pom[5]), Double.parseDouble(pom[6]),
-						Integer.parseInt(pom[1]));
+						Integer.parseInt(pom[1]), projectedTo.y, projectedTo.x);
+
+				if(!g.containsNode(from)) g.addNode(from);
+				if(!g.containsNode(to)) g.addNode(to);
+
 				return new TourEdge(from, to, Double.parseDouble(pom[7]), Double.parseDouble(pom[2]));
 			}).forEach(e -> {
 				g.addEdge(e);
+
 				counter.getAndIncrement();
 				if (total / 100 * percent[0] < counter.get()) {
 					log.info(percent[0] + "% done");
@@ -208,43 +239,5 @@ public class TourGraph implements GraphStructure<TourNode, TourEdge>, Serializab
 			e.printStackTrace();
 		}
 		return g;
-	}
-
-	public boolean graphToKryo(String outputFile) {
-		Kryo kryo = new Kryo();
-		kryo.register(TourGraph.class);
-		kryo.register(HashBasedTable.class, new JavaSerializer());
-
-		try {
-			Output output = new Output(new FileOutputStream(outputFile));
-			kryo.writeObject(output, this);
-			output.close();
-
-			return true;
-		} catch (FileNotFoundException e) {
-			log.error(e.getMessage(), e);
-		}
-
-		return true;
-	}
-
-	public static TourGraph graphFromKryo(String inputFile) {
-		Kryo kryo = new Kryo();
-		kryo.register(TourGraph.class);
-		kryo.register(HashBasedTable.class, new JavaSerializer());
-
-		Input in = null;
-		try {
-			in = new Input(new FileInputStream(inputFile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		}
-		System.out.println("Starting to read");
-		TourGraph serializableTnsGraph = kryo.readObject(in, TourGraph.class);
-		in.close();
-		System.out.println("Done");
-
-		return serializableTnsGraph;
 	}
 }

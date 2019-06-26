@@ -9,6 +9,8 @@ public class ForwardPathGoalChecker implements GoalChecker<ForwardPathLabel> {
 	private double minLength;
 	private TourNode goalNode;
 	private static final double epsilon = 0.001;
+	private static final double COEF = 1.8;
+
 
 	public ForwardPathGoalChecker(double minLength, TourNode goalNode) {
 		this.minLength = minLength;
@@ -21,8 +23,8 @@ public class ForwardPathGoalChecker implements GoalChecker<ForwardPathLabel> {
 
 		double minlenMinCurlen = minLength - current.getCandidate().length;
 		double distance = TourUtils
-				.computeGreatCircleDistance(curN.getNode().getLatitude(), curN.getNode().getLongitude(),
-						goalNode.getLatitude(), goalNode.getLongitude());
+				.computeEuclideanDistance(curN.getNode().getLatProjected(), curN.getNode().getLonProjected(),
+						goalNode.getLatProjected(), goalNode.getLonProjected()) * COEF;
 		return (minlenMinCurlen < 0 || distance + epsilon >= minlenMinCurlen);
 
 	}

@@ -86,7 +86,7 @@ public class CandidatesPicker {
 		Iterator<Candidate> tmp = candidates.iterator();
 		for (int j = 0; j < candidates.size(); j++) {
 			double d = TourUtils
-					.computeGreatCircleDistance(selected.correspNode.getNode(), tmp.next().correspNode.getNode());
+					.computeEuclideanDistance(selected.correspNode.getNode(), tmp.next().correspNode.getNode());
 			if (d < distances[j])
 				distances[j] = d;
 		}
@@ -151,8 +151,8 @@ public class CandidatesPicker {
 					probabilities[i] *= 1 - (1 - y) * Math.exp(b * (x - distances[i] / maxDistance));
 			}
 		}
-		double lonScale = TourUtils.computeGreatCircleDistance(centerLat, centerLon, centerLat, centerLon + 1);
-		double latScale = TourUtils.computeGreatCircleDistance(centerLat, centerLon, centerLat + 1, centerLon + 1);
+		double lonScale = TourUtils.computeEuclideanDistance(centerLat, centerLon, centerLat, centerLon + 1);
+		double latScale = TourUtils.computeEuclideanDistance(centerLat, centerLon, centerLat + 1, centerLon + 1);
 
 		// Density
 		double latTile = 0.05 * minLength / latScale, lonTile = 0.05 * minLength / lonScale;

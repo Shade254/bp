@@ -1,8 +1,8 @@
 package cz.matocmir.tours;
 
 import com.umotional.basestructures.BoundingBox;
-import cz.matocmir.tours.api.PlannerAPI;
-import cz.matocmir.tours.utils.KDTree;
+import com.umotional.geotools.Transformer;
+import com.vividsolutions.jts.geom.Coordinate;
 import cz.matocmir.tours.backpath.BackPath;
 import cz.matocmir.tours.backpath.BackPathFinder;
 import cz.matocmir.tours.filters.CandidateFilter;
@@ -12,9 +12,12 @@ import cz.matocmir.tours.filters.Path2DistanceRatioFilter;
 import cz.matocmir.tours.forwardpath.CandidateFinder;
 import cz.matocmir.tours.forwardpath.CandidatesPicker;
 import cz.matocmir.tours.model.*;
+import cz.matocmir.tours.utils.KDTree;
+import cz.matocmir.tours.utils.KryoTourGraphReader;
 import cz.matocmir.tours.utils.TourNodeResolver;
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -27,7 +30,9 @@ import java.util.stream.Collectors;
  * The inner working of every method is described in the project paper Chapter 4
  */
 public class PlannerService {
-	private static final String PATH_TO_GRAPH = "./src/main/resources/prague_min.csv";
+	private static final String PATH_TO_GRAPH = "/home/matocha/prague.kryo";
+	//private static final String PATH_TO_GRAPH = "./src/main/resources/prague.kryo";
+	private static final int SRID = 2065;
 	private static final Logger log = Logger.getLogger(PlannerService.class);
 	private static final int DEFAULT_TOURS_NUM = 5;
 
@@ -43,13 +48,13 @@ public class PlannerService {
 	public Integer tried1Last = 0;
 	public Integer tried2Last = 0;
 
-	public PlannerService(String path){
-		graph = TourGraph.graphFromCSV(path);
+	public PlannerService(String path, int srid){
+		graph = (new KryoTourGraphReader(new File(path))).read();
 		init();
 	}
 
 	public PlannerService() {
-		graph = TourGraph.graphFromCSV(PATH_TO_GRAPH);
+		graph = (new KryoTourGraphReader(new File(PATH_TO_GRAPH))).read();
 		init();
 	}
 
@@ -78,7 +83,9 @@ public class PlannerService {
 	 * @return TourNode closest to these coordinates
 	 */
 	public TourNode getNearestNode(double[] coords) {
-		return nodesTree.getNearestNode(coords);
+		Transformer former = new Transformer(SRID);
+		Coordinate projected = former.toProjected(new Coordinate(coords[0], coords[1]));
+		return nodesTree.getNearestNode(new double[]{projected.x, projected.y});
 	}
 
 	/***
@@ -117,6 +124,9 @@ public class PlannerService {
 			cands = filter.filter(cands);
 		}
 		cands = (new Path2DistanceRatioFilter(1.7,0.5,graph.getNode(request.getStartNode()))).filter(cands);
+		List<TourNode> vi = new ArrayList<>();
+		vi.add(graph.getNode(request.getStartNode()));
+		//IOUtils.visualizeNodes(vi, "./result"+Path2DistanceRatioFilter.counter+"/points" + Path2DistanceRatioFilter.counter + ".json");
 
 		log.info("Picked " + cands.size() + " candidates");
 
@@ -341,7 +351,10 @@ public class PlannerService {
 			turningPoints = filter.filter(turningPoints);
 		}
 		turningPoints = (new Path2DistanceRatioFilter(1.7,0.5,graph.getNode(request.getStartNode()))).filter(turningPoints);
-
+		List<TourNode> vi = new ArrayList<>();
+		vi.add(graph.getNode(request.getStartNode()));
+		vi.add(graph.getNode(request.getGoalNode()));
+		//IOUtils.visualizeNodes(vi, "./result"+Path2DistanceRatioFilter.counter+"/points" + Path2DistanceRatioFilter.counter + ".json");
 
 		log.info("Picked " + turningPoints.size() + " candidates");
 
@@ -379,9 +392,7 @@ public class PlannerService {
 			}
 
 			forwardPath.addAll(bp.getExactPath());
-			double totalCost = forwardPath.stream().mapToDouble(TourEdge::getCost).sum() + turningPoint.weight;
-			tour = new Tour(forwardPath, turningPoint.correspNode.getNode(), turningPoint.correspNode.getNode(),
-					totalCost);
+			tour = new Tour(forwardPath, turningPoint.correspNode.getNode(), turningPoint.correspNode.getNode());
 
 			if (tour.getOriginalEdges() != null && !tour.getOriginalEdges().isEmpty()) {
 				System.out.println(foundWalks + ". path to goal found");
@@ -404,6 +415,7 @@ public class PlannerService {
 
 		response.setResponseTime(System.currentTimeMillis() - stopwatch);
 		response.setTours(result.toArray(new Tour[0]));
+
 
 		return response;
 	}

@@ -22,8 +22,8 @@ public class TourUtils {
 	}
 
 	public static double computeEuclideanDistance(TourNode node, TourNode node1) {
-		return computeEuclideanDistance(node.getLatitude(), node.getLongitude(), node.getLatitude(),
-				node.getLongitude());
+		return computeEuclideanDistance(node.getLatProjected(), node.getLonProjected(), node1.getLatProjected(),
+				node1.getLonProjected());
 	}
 
 	//angle = 360/(2*pi*r/distance)
@@ -51,34 +51,47 @@ public class TourUtils {
 		return l;
 	}
 
-		public static double tourPenalty(List<TourEdge> walk, double totalLength, boolean p2p) {
+	public static double tourPenalty(List<TourEdge> walk, double totalLength, boolean p2p) {
 		double penalty = 0;
 		double distance;
 
 		for (int i = 0; i < walk.size(); i++) {
+			//System.out.println(" - - - - - ");
 			TourEdge curEdge = walk.get(i);
 			distance = (curEdge.getLengthInMeters()/2);
-			for (int j = i; j < walk.size(); j++) {
-				TourEdge secondEdge = walk.get(j);
+			for (int j = 0; j < walk.size(); j++) {
+				TourEdge secondEdge = walk.get((i+j)%walk.size());
+				if(secondEdge.equals(curEdge)){
+					continue;
+				}
+
 				distance += (secondEdge.getLengthInMeters()/2);
 				double intermediate;
 				if(!p2p) {
+					//System.out.println(curEdge.getFromId() + "->" + curEdge.getToId() + "X" + secondEdge.getFromId() + "->"+secondEdge.getToId());
 					double pen = curEdge.roundnessPenalty(secondEdge, Math.min(distance, totalLength - distance), 1);
-					//System.out.println(curEdge.getFromId() + "->" + curEdge.getToId() + "X" + secondEdge.getFromId() + "->"+secondEdge.getToId() + " : " + pen + " * " + (curEdge.getLengthInMeters()*secondEdge.getLengthInMeters()));
-					intermediate = 2 * (pen * curEdge.getLengthInMeters()
-									* secondEdge.getLengthInMeters());
+
+					intermediate = (pen * curEdge.getLengthInMeters() * secondEdge.getLengthInMeters());
+					if(pen!=0.0) {
+						//System.out.println("Penalty: " + pen + " x " + curEdge.getLengthInMeters() + " x " + secondEdge.getLengthInMeters() + " = " + intermediate + "( " + (intermediate/(Math.pow(totalLength, 2))) + " )");
+
+					}
 				} else {
-					intermediate =
-							2 * (curEdge.roundnessPenalty(secondEdge, distance, 1) * curEdge.getLengthInMeters()
+					intermediate = (curEdge.roundnessPenalty(secondEdge, distance, 1) * curEdge.getLengthInMeters()
 									* secondEdge.getLengthInMeters());
 
 				}
 				penalty += intermediate;
 				distance += (secondEdge.getLengthInMeters()/2);
 			}
+			//System.out.println(" - - - - - ");
 		}
 		penalty /= (Math.pow(totalLength, 2));
 		return penalty;
+	}
+
+	public static double getPathCost(List<TourEdge> path) {
+		return path.stream().mapToDouble(TourEdge::getCost).sum();
 	}
 
 	public double getDegreeBetweenEdges(TourNode common, TourNode first, TourNode second) {

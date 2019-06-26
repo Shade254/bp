@@ -1,31 +1,45 @@
 package cz.matocmir.tours.model;
 
+import com.umotional.basestructures.GPSLocation;
 import com.umotional.basestructures.INode;
+import com.umotional.geotools.Transformer;
+import com.vividsolutions.jts.geom.Coordinate;
+
+import java.io.Serializable;
+
 /***
  * Representation of single node in the graph
  */
-public class TourNode implements INode {
-	private double lat;
-	private double lon;
-	private int id;
+public class TourNode implements INode, Serializable {
+	public GPSLocation location;
+	public int id;
 
 	public TourNode() {
 	}
 
-	public TourNode(double lat, double lon, int id) {
-		this.lat = lat;
-		this.lon = lon;
+	public TourNode(double lat, double lon, int id, int srid) {
+		Transformer transformer = new Transformer(srid);
+		Coordinate c = transformer.toProjected(new Coordinate(lat, lon));
+		this.location = new GPSLocation(lat, lon, (int)c.x, (int)c.y);
 		this.id = id;
 	}
 
+
+	public TourNode(double lat, double lon, int id, double latProjected, double lonProjected) {
+		this.location = new GPSLocation(lat, lon, (int)latProjected, (int)lonProjected);
+		this.id = id;
+	}
+
+
+
 	@Override
 	public double getLatitude() {
-		return lat;
+		return location.getLatitude();
 	}
 
 	@Override
 	public double getLongitude() {
-		return lon;
+		return location.getLongitude();
 	}
 
 	@Override
@@ -38,8 +52,11 @@ public class TourNode implements INode {
 		return -1;
 	}
 
-	@Override
-	public String toString() {
-		return "TourNode{" + "lat=" + lat + ", lon=" + lon + ", id=" + id + '}';
+	public double getLonProjected() {
+		return location.lonProjectedE1;
+	}
+
+	public double getLatProjected() {
+		return location.latProjectedE1;
 	}
 }

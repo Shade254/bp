@@ -64,7 +64,7 @@ public class P2PBackPathLabelFactory implements LabelFactory<BackPathLabel> {
 		List<BackPathLabel> labels = new ArrayList<>();
 
 		double tourL = current.getCandidate().length + TourUtils
-				.computeGreatCircleDistance(goalNode, curCan.correspNode.getNode());
+				.computeEuclideanDistance(goalNode, curCan.correspNode.getNode());
 
 		if (tourL + forwardLength >= maxLength + epsilon) {
 			return Collections.emptyList();
@@ -72,7 +72,7 @@ public class P2PBackPathLabelFactory implements LabelFactory<BackPathLabel> {
 
 		for (TourEdge e : outEdges) {
 			double weight = countWeight(e, curCan.length);
-			Candidate nxtCan = new Candidate(new TreeNode(e, curCan.correspNode, e.getTo()), curCan.weight + weight,
+			Candidate nxtCan = new Candidate(new TreeNode(e, curCan.correspNode, graph.getNode(e.getToId())), curCan.weight + weight,
 					curCan.length + e.getLengthInMeters());
 			BackPathLabel label = new BackPathLabel(e.getToId(), new int[] { (int) nxtCan.weight }, current, nxtCan);
 			labels.add(label);

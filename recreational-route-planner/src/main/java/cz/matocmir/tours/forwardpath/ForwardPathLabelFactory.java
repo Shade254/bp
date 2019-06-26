@@ -40,11 +40,11 @@ public class ForwardPathLabelFactory implements LabelFactory<ForwardPathLabel> {
 		List<ForwardPathLabel> labels = new ArrayList<>();
 
 		for (TourEdge e : outEdges) {
-			Candidate nxtCan = new Candidate(new TreeNode(e, curCan.correspNode, e.getTo()),
+			Candidate nxtCan = new Candidate(new TreeNode(e, curCan.correspNode, graph.getNode(e.getToId())),
 					curCan.weight + countWeight(e, curCan), curCan.length + e.getLengthInMeters());
 
 			double tourL2 = nxtCan.length + TourUtils
-					.computeGreatCircleDistance(nxtCan.correspNode.getNode().getLatitude(),
+					.computeEuclideanDistance(nxtCan.correspNode.getNode().getLatitude(),
 							nxtCan.correspNode.getNode().getLongitude(), graph.getNode(goalNode).getLatitude(),
 							graph.getNode(goalNode).getLongitude());
 

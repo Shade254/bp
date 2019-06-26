@@ -6,40 +6,45 @@ import com.umotional.basestructures.IEdge;
 import com.umotional.basestructures.INode;
 import cz.matocmir.tours.utils.TourUtils;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 /***
  * Representation of single edge in the graph
  */
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TourEdge implements IEdge {
-	private TourNode from;
-	private TourNode to;
-	private double cost;
-	private double length;
-	private GPSLocation middle;
+public class TourEdge implements IEdge, Serializable {
+	public double cost;
+	public double length;
+	public GPSLocation middle;
+	public int fromId;
+	public int toId;
+	public GPSLocation from;
+	public GPSLocation to;
 
 	public TourEdge() {
 	}
 
 	public TourEdge(TourNode from, TourNode to, double cost, double length) {
-		this.from = from;
-		this.to = to;
+		this.fromId = from.getId();
+		this.toId = to.getId();
 		this.cost = cost;
 		this.length = length;
-		middle = new GPSLocation((from.getLatitude() + to.getLatitude() / 2),
-				(from.getLongitude() + to.getLongitude()) / 2, 0, 0);
+		this.from = new GPSLocation(from.getLatitude(), from.getLongitude(), (int) from.getLatProjected(), (int) from.getLonProjected());
+		this.to = new GPSLocation(to.getLatitude(), to.getLongitude(), (int) to.getLatProjected(), (int) to.getLonProjected());
+		this.middle = createMiddle();
 	}
 
 	public TourEdge(TourNode from, TourNode to, double cost) {
-		this.from = from;
-		this.to = to;
+		this.fromId = from.getId();
+		this.toId = to.getId();
 		this.cost = cost;
-		length = (int) (TourUtils.computeGreatCircleDistance(from.getLatitude(), from.getLongitude(), to.getLatitude(),
-				to.getLongitude()));
-		middle = new GPSLocation((from.getLatitude() + to.getLatitude() / 2),
-				(from.getLongitude() + to.getLongitude()) / 2, 0, 0);
+		length = (int) (TourUtils.computeEuclideanDistance(from, to));
+		this.from = new GPSLocation(from.getLatitude(), from.getLongitude(), (int) from.getLatProjected(), (int) from.getLonProjected());
+		this.to = new GPSLocation(to.getLatitude(), to.getLongitude(), (int) to.getLatProjected(), (int) to.getLonProjected());
+		this.middle = createMiddle();
 	}
 
 	/***
@@ -51,14 +56,11 @@ public class TourEdge implements IEdge {
 	 */
 	public double roundnessPenalty(TourEdge e2, double distance, double strictness) {
 		double dExp = TourUtils.getExpectedDisplacement(distance);
-
-		//System.out.println("Expected distance " + dExp);
-
 		double displacement = TourUtils
-				.computeGreatCircleDistance(middle.getLatitude(), middle.getLongitude(), e2.middle.getLatitude(),
-						e2.middle.getLongitude());
+				.computeEuclideanDistance(this.middle.latProjectedE1, this.middle.lonProjectedE1, e2.middle.latProjectedE1, e2.middle.lonProjectedE1);
 
-		//System.out.println("Actual displacement " + displacement);
+		System.out.println("Expected displacement " + dExp);
+		System.out.println("Actual displacement " + displacement);
 
 		if (displacement >= (dExp * strictness)) {
 			return 0;
@@ -67,17 +69,11 @@ public class TourEdge implements IEdge {
 		return ((strictness * dExp) - displacement) / (strictness * dExp);
 	}
 
-	public double getDisplacement(TourEdge e2) {
-		return TourUtils
-				.computeGreatCircleDistance(middle.getLatitude(), middle.getLongitude(), e2.middle.getLatitude(),
-						e2.middle.getLongitude());
-	}
-
-	public TourNode getFrom() {
+	public GPSLocation getFrom() {
 		return from;
 	}
 
-	public TourNode getTo() {
+	public GPSLocation getTo() {
 		return to;
 	}
 
@@ -91,12 +87,12 @@ public class TourEdge implements IEdge {
 
 	@Override
 	public int getFromId() {
-		return from.getId();
+		return fromId;
 	}
 
 	@Override
 	public int getToId() {
-		return to.getId();
+		return toId;
 	}
 
 	@Override
@@ -110,8 +106,30 @@ public class TourEdge implements IEdge {
 	}
 
 	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		TourEdge tourEdge = (TourEdge) o;
+		return Double.compare(tourEdge.getCost(), getCost()) == 0 && Double.compare(tourEdge.length, length) == 0
+				&& Objects.equals(getFrom(), tourEdge.getFrom()) && Objects.equals(getTo(), tourEdge.getTo()) && Objects
+				.equals(getMiddle(), tourEdge.getMiddle());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getFrom(), getTo(), getCost(), length, getMiddle());
+	}
+
+	@Override
 	public String toString() {
 		return "TourEdge{" + "from=" + from + ", to=" + to + ", cost=" + cost + ", length=" + length + ", middle="
 				+ middle + '}';
+	}
+
+	private GPSLocation createMiddle(){
+		return new GPSLocation((from.getLatitude() + to.getLatitude())/2,
+		(from.getLongitude() + to.getLongitude()) / 2, (from.latProjectedE1+to.latProjectedE1)/2, (from.lonProjectedE1+to.lonProjectedE1)/2);
 	}
 }
